@@ -1,0 +1,145 @@
+.user-form{
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#user-login-form{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    padding: 2em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+}
+
+.input-user-form{
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    height: 1.50em;
+}
+
+.div-inside-form{
+    margin: 0.50em;
+}
+
+#age{
+    width: 3em;
+}
+
+#level{
+    width: 8em;
+}
+#submit-button{
+    height: 2em;
+    border-radius: 8px;
+    border-color: transparent;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 1em;
+    font-weight: bolder;
+    color: white;
+    background-color: purple;
+}
+
+#main-container{
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: #f8f7fd;
+}
+
+.th-exercise{
+    background-color: #837aad;
+}
+
+.container-input-exer{
+    display: flex;
+    flex-direction: column;
+
+    margin: 0.25em;
+}
+
+.exercise-user-form{
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    height: 2em;
+}
+#exercise-form{
+    display: flex;
+    margin-bottom: 1em;
+    align-items: end;
+}
+
+.label-exer{
+    font-weight: bold;
+}
+
+
+#submit-exercises{
+    background-color: #6a59b6;
+    color: white;
+    height: 2.5em;
+    border-color: transparent;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: 0.25em;
+    margin-left: 1em;
+}
+
+#exercise-container{
+    background-color: white;
+    border-radius: 8px;
+    height: 40vh;
+    width: 95vh;
+    padding: 1em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#exercises-table{
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.value-exer{
+    text-align: center;
+    
+}
+
+#profile-container{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 8px;
+    height: 22vh;
+    width: 95vh;
+    padding: 1em;
+    margin: 1em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.profile-info{
+    font-weight: 700;
+}
+
+#average-container{
+    background-color: white;
+    width: 98vh;
+    margin-top: 1em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.summary-text{
+    font-weight: 700;
+}
