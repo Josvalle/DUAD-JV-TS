@@ -72,8 +72,15 @@
 }
 #exercise-form{
     display: flex;
+    flex-direction: column;
     margin-bottom: 1em;
-    align-items: end;
+    align-items: center;
+}
+
+#container-inputs{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .label-exer{
@@ -85,11 +92,13 @@
     background-color: #6a59b6;
     color: white;
     height: 2.5em;
+    width: 15em;
     border-color: transparent;
     border-radius: 8px;
     font-weight: bold;
     margin-bottom: 0.25em;
-    margin-left: 1em;
+    margin-top: 1em;
+    
 }
 
 #exercise-container{
@@ -142,4 +151,13 @@
 
 .summary-text{
     font-weight: 700;
+}
+
+#stats-containter{
+    display: flex;
+    align-items: center;
+}
+
+#contain-week-rutine{
+    margin-right: 3em;
 }

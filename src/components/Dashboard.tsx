@@ -2,48 +2,8 @@ import { useState } from "react";
 import {Formik, Form, Field, ErrorMessage} from 'formik'
 import * as Yup from 'yup'
 import '../styles/dashboard.css'
-
-type UserLevel = "Principiante" | "Intermedio" | "Avanzado"
-
-type WeekDays = "Domingo" | "Lunes" | "Martes" | "Miercoles" | "Jueves" | "Viernes" | "Sabado"
-
-interface RoutineEntry  {
-    exerciseName:string;
-    day:WeekDays
-}
-
-interface WeekRutine {
-    name:string;
-    exersices:RoutineEntry[]
-}
-
-interface UserInformation {
-    name:string;
-    age:number;
-    level:UserLevel;
-}
-
-interface ExerciseInfo {
-    nameE:string;
-    minutes:number;
-    totalCalories:number;
-    distance: number | null;
-
-}
-
-interface ExerciseForm {
-    nameE:string;
-    minutes:number | string;
-    caloriesPerMinute:number | string;
-    distance: number | string;
-}
-
-interface ExerciseMaxCalories {
-    name: string;
-    calories:number;
-    percentaje:number;
-}
-
+import type {WeekDays,ExerciseInfo, ExerciseForm,ExerciseMaxCalories,RoutineEntry,WeekRutine} from '../types/Exercises'
+import type { UserLevel,UserInformation } from "../types/Users";
 
 
 const initialUserValues:UserInformation={
@@ -51,7 +11,7 @@ const initialUserValues:UserInformation={
 }
 
 const initialExercisesValues:ExerciseForm={
-    nameE:'',minutes:'',caloriesPerMinute:'',distance:''
+    day:'Domingo',nameE:'',minutes:'',caloriesPerMinute:'',distance:''
 }
 
 const objectValidation = Yup.object(
@@ -69,6 +29,7 @@ const objectEValidation = Yup.object(
         nameE: Yup.string().required('Por favor ingresa el nombre del ejercicio'),
         minutes: Yup.number().required('Por favor ingresa los minutos de ejericio'),
         caloriesPerMinute:Yup.number().required('Por favor ingresa la cantidad de calorias por minuto para este ejericio'),
+        day: Yup.mixed<WeekDays>().oneOf(["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"],"Elige uno de los niveles disponibles").required("Dia de la semana necesario")
     }
 )
 
@@ -84,11 +45,11 @@ function ConvertMeters(totalMinutes:number, totalMeters:number,):string {
     return `Ritmo: ${pace.toFixed(2)} min/km`;
 }
 
-function obtainMaxCalories(exercises: ExerciseInfo[]): ExerciseMaxCalories {
+function obtainMaxCalories(exercises: RoutineEntry[]): ExerciseMaxCalories {
     const result = exercises.reduce((amount, actualExercise) => {
-            amount.totalCalories += actualExercise.totalCalories;
+            amount.totalCalories += actualExercise.exersiceInfo.totalCalories;
 
-            if (actualExercise.totalCalories > amount.exerciseMax.totalCalories) {
+            if (actualExercise.exersiceInfo.totalCalories > amount.exerciseMax.exersiceInfo.totalCalories) {
                     amount.exerciseMax = actualExercise;
                 }
 
@@ -97,22 +58,41 @@ function obtainMaxCalories(exercises: ExerciseInfo[]): ExerciseMaxCalories {
             {totalCalories: 0,exerciseMax: exercises[0]}
         );
 
-    const percentaje = (result.exerciseMax.totalCalories / result.totalCalories) * 100;
+    const percentaje = (result.exerciseMax.exersiceInfo.totalCalories / result.totalCalories) * 100;
     const exerciseObject: ExerciseMaxCalories = {
-        name: result.exerciseMax.nameE,
-        calories: result.exerciseMax.totalCalories,
+        name: result.exerciseMax.exersiceInfo.nameE,
+        calories: result.exerciseMax.exersiceInfo.totalCalories,
         percentaje: percentaje
     };
 
     return exerciseObject;
     }
 
+function obtainAveragePerDay(exercise: RoutineEntry[]):number{
+    const trainedday = new Set(exercise.map((entry)=>entry.day))
+    
+    const amountOfDay = trainedday.size
+
+    const totalCalories = exercise.reduce((count,actualC)=>{
+        count += actualC.exersiceInfo.totalCalories
+        return count;
+    },0)
+
+        const averageCalories = amountOfDay === 0 ? 0 : totalCalories/amountOfDay
+        return averageCalories
+    }
+
+
+
 function MainPage(){
     const [user, setUser] = useState<UserInformation | null>(null);
     const [userLogin, setUserLogin] = useState <boolean>(false);
-    const [exercises, setExercises] = useState<ExerciseInfo[]>([])
+    const [weekRutine,setWeekRutine] = useState<WeekRutine>({
+        name: 'Mi rutine Semanal',
+        exersices:[]
+    })
     const [maxCalories, setMaxCalories]= useState<ExerciseMaxCalories | null>(null)
-    const [maxTime, setMaxTime]=useState<ExerciseInfo | null>(null)
+    const [maxTime, setMaxTime]=useState<RoutineEntry | null>(null)
 
     if(userLogin === false){
         return(
@@ -179,53 +159,72 @@ function MainPage(){
                         validateOnBlur={false}
                         validateOnChange={false}
                         onSubmit={(values, {resetForm})=>{
-                                const newValues: ExerciseInfo ={ 
+                                const exerciseValues: ExerciseInfo ={ 
                                         "nameE":values.nameE, 
                                         "minutes":Number(values.minutes), 
                                         "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes), 
                                         "distance":values.distance === ""? null : Number(values.distance)
-                                    }
+                                    };
+                                const rutineEntry: RoutineEntry ={
+                                        "day":values.day,
+                                        "exersiceInfo":exerciseValues
+                                    };
 
-                                    const newExercises = [...exercises,newValues]
-                                    setExercises(newExercises)
+                                    
+                                    const addingRutine = [...weekRutine?.exersices, rutineEntry];
 
-                                    const lookMaxCalories = obtainMaxCalories(newExercises)
+                                    const lookMaxCalories = obtainMaxCalories(addingRutine);
 
-                                    const lookMaxtime = newExercises.reduce((maxTime,actualTime)=>
-                                        actualTime.minutes > maxTime.minutes ? actualTime : maxTime
-                                    )
-
-
-                                    setMaxCalories(lookMaxCalories)
-                                    setMaxTime(lookMaxtime)
-                                    resetForm()
+                                    const lookMaxtime = addingRutine.reduce((maxTime,actualTime)=>
+                                        actualTime.exersiceInfo.minutes > maxTime.exersiceInfo.minutes ? actualTime : maxTime
+                                    );
+                                    setWeekRutine({...weekRutine, exersices: addingRutine});
+                                    setMaxCalories(lookMaxCalories);
+                                    setMaxTime(lookMaxtime);
+                                    resetForm();
                                 
                                 }}
                     >
                         <Form id="exercise-form">
-                            <div className="container-input-exer">
-                                <label className="label-exer" htmlFor="nameE">Nombre del Ejercicio: </label>
-                                <Field id="nameE" className="exercise-user-form" name='nameE' placehold='Por favor ingresa el nombre del ejercicio' ></Field>
-                                <ErrorMessage name="nameE" component='p'></ErrorMessage>
+                            <div id="container-inputs">
+                                    <div className="container-input-exer">
+                                    <label className="label-exer" htmlFor="day">Dia de la Semana</label>
+                                    <Field as='select' id="day" className="exercise-user-form" name='day' >
+                                        <option value="Domingo">Domingo</option>
+                                        <option value="Lunes">Lunes</option>
+                                        <option value="Martes">Martes</option>
+                                        <option value="Miercoles">Miercoles</option>
+                                        <option value="Jueves">Jueves</option>
+                                        <option value="Viernes">Viernes</option>
+                                        <option value="Sabado">Sabado</option>
+                                    </Field>
+                                    <ErrorMessage name="day" component='p'></ErrorMessage>
+                                </div>
+                                <div className="container-input-exer">
+                                    <label className="label-exer" htmlFor="nameE">Nombre del Ejercicio: </label>
+                                    <Field id="nameE" className="exercise-user-form" name='nameE' placehold='Por favor ingresa el nombre del ejercicio' ></Field>
+                                    <ErrorMessage name="nameE" component='p'></ErrorMessage>
+                                </div>
+                                
+                                <div className="container-input-exer">
+                                    <label className="label-exer" htmlFor="minutes">Minutos de ejercicio: </label>
+                                    <Field id="minutes" className="exercise-user-form" name='minutes' placehold='Cuantos minutos duro el ejercicio' ></Field>
+                                    <ErrorMessage name="minutes" component='p'></ErrorMessage>
+                                </div>
+                                
+                                <div className="container-input-exer">
+                                    <label className="label-exer" htmlFor="caloriesPerMinute">Calorias por minuto: </label>
+                                    <Field id="caloriesPerMinute" className="exercise-user-form" name='caloriesPerMinute' placehold='Por favor ingresa la cantidad de cuántas calorías quema por minuto' ></Field>
+                                    <ErrorMessage name="caloriesPerMinute" component='p'></ErrorMessage>
+                                </div>
+                                
+                                <div className="container-input-exer">
+                                    <label className="label-exer" htmlFor="distance">Distancia: </label>
+                                    <Field id="distance" className="exercise-user-form" name='distance' placeholder='*Opcional Distancia en mts ' ></Field>
+                                    <ErrorMessage name="distance" component='p'></ErrorMessage>
+                                </div>
                             </div>
                             
-                            <div className="container-input-exer">
-                                <label className="label-exer" htmlFor="minutes">Minutos de ejercicio: </label>
-                                <Field id="minutes" className="exercise-user-form" name='minutes' placehold='Cuantos minutos duro el ejercicio' ></Field>
-                                <ErrorMessage name="minutes" component='p'></ErrorMessage>
-                            </div>
-                            
-                            <div className="container-input-exer">
-                                <label className="label-exer" htmlFor="caloriesPerMinute">Calorias por minuto: </label>
-                                <Field id="caloriesPerMinute" className="exercise-user-form" name='caloriesPerMinute' placehold='Por favor ingresa la cantidad de cuántas calorías quema por minuto' ></Field>
-                                <ErrorMessage name="caloriesPerMinute" component='p'></ErrorMessage>
-                            </div>
-                            
-                            <div className="container-input-exer">
-                                <label className="label-exer" htmlFor="distance">Distancia: </label>
-                                <Field id="distance" className="exercise-user-form" name='distance' placeholder='*Opcional Distancia en mts ' ></Field>
-                                <ErrorMessage name="distance" component='p'></ErrorMessage>
-                            </div>
                             
                             
                             <button type="submit" id="submit-exercises">Agregar ejercicio</button>
@@ -238,6 +237,7 @@ function MainPage(){
                         <table id="exercises-table">
                             <thead id="exercise-table">
                                 <tr id='th-containers'>
+                                    <th className="th-exercise">Dia</th>
                                     <th className="th-exercise">Ejercicio</th>
                                     <th className="th-exercise">Mintuos de Ejercico</th>
                                     <th className="th-exercise">Ritmo</th>
@@ -246,12 +246,13 @@ function MainPage(){
                             </thead>
                             <tbody>
                                 {
-                                    exercises.map((exercises)=>(
-                                        <tr key={exercises.nameE}className="exercise-row">
-                                            <td className="value-exer">{exercises.nameE}</td>
-                                            <td className="value-exer">{ConvertMinutes(exercises.minutes)}</td>
-                                            <td className="value-exer">{exercises.distance === null? ',' : ConvertMeters(exercises.minutes,exercises.distance)}</td>
-                                            <td className="value-exer">{exercises.totalCalories}</td>
+                                    weekRutine.exersices.map((exercises)=>(
+                                        <tr key={exercises.exersiceInfo.nameE}className="exercise-row">
+                                            <td className="value-exer">{exercises.day}</td>
+                                            <td className="value-exer">{exercises.exersiceInfo.nameE}</td>
+                                            <td className="value-exer">{ConvertMinutes(exercises.exersiceInfo.minutes)}</td>
+                                            <td className="value-exer">{exercises.exersiceInfo.distance === null? ',' : ConvertMeters(exercises.exersiceInfo.minutes,exercises.exersiceInfo.distance)}</td>
+                                            <td className="value-exer">{exercises.exersiceInfo.totalCalories}</td>
                                         </tr>
                                     ))
                                 }
@@ -261,8 +262,18 @@ function MainPage(){
                 </div>
                 <div id='average-container'>
                     <h2>📊 Resumen comparativo</h2>
-                    {maxTime ? (<p className="summary-text" >Mayor duración: {maxTime.nameE} ({ConvertMinutes(maxTime.minutes)})</p>) : (<p className="summary-text">No hay ejercicios registrados</p>)}
-                    <p className="summary-text" > Mas Calorias: {maxCalories?.name} ({maxCalories?.calories} Cal, {maxCalories?.percentaje.toFixed(2)}% del total)</p>
+                    <div id="stats-containter" >
+                            <div id="contain-week-rutine">
+                            <h3 id="rutine-name">Rutina: {weekRutine.name}</h3>
+                            <p id="average-per-day" >Promedio por dia entrenado: {obtainAveragePerDay(weekRutine.exersices)} Calorias</p>
+                        </div>
+                        <div id="contain-exercises-stats" >
+                            {maxTime ? (<p className="summary-text" >Mayor duración: {maxTime.exersiceInfo.nameE} ({ConvertMinutes(maxTime.exersiceInfo.minutes)})</p>) : (<p className="summary-text">No hay ejercicios registrados</p>)}
+                        <p className="summary-text" > Mas Calorias: {maxCalories?.name} ({maxCalories?.calories} Cal, {maxCalories?.percentaje.toFixed(2)}% del total)</p>
+                        </div>
+                    </div>
+                    
+                    
                 </div>
             </div>
             
