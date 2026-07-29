@@ -4,4 +4,5 @@ export interface UserInformation {
     name:string;
     age:number;
     level:UserLevel;
+    routine:string;
 }

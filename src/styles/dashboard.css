@@ -104,8 +104,8 @@
 #exercise-container{
     background-color: white;
     border-radius: 8px;
-    height: 40vh;
-    width: 95vh;
+    height: auto;
+    width: 70%;
     padding: 1em;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -127,8 +127,8 @@
     flex-direction: column;
     background-color: white;
     border-radius: 8px;
-    height: 22vh;
-    width: 95vh;
+    height: auto;
+    width: 70%;
     padding: 1em;
     margin: 1em;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -140,7 +140,7 @@
 
 #average-container{
     background-color: white;
-    width: 98vh;
+    width: 72%;
     margin-top: 1em;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
@@ -160,4 +160,8 @@
 
 #contain-week-rutine{
     margin-right: 3em;
+}
+
+#contain-exercises-stats{
+    margin-left: 1em;
 }

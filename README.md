@@ -1,32 +1,53 @@
-# React + TypeScript + Vite
+# A React, TypeScript, and Vite application for registering a user, creating a weekly routine, adding exercises, and displaying exercise statistics.
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+# Features
 
-Currently, two official plugins are available:
+Register the user's name, age, experience level, and routine name.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Register exercises by day of the week.
 
-## React Compiler
+Calculate calories burned.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Calculate pace in minutes per kilometer.
 
-## Expanding the Oxlint configuration
+Display total calories burned in the routine.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+Calculate average calories burned per training day.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+Show the exercise with the longest duration.
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Show the exercise that burned the most calories.
+
+# Installation and Setup
+
+Make sure Node.js is installed on your computer.
+
+Clone the repository:
+
+git clone https://github.com/Josvalle/DUAD-JV-TS.git
+
+Open the project folder:
+
+cd DUAD-JV-TS
+
+Install the dependencies:
+
+npm install
+
+Start the development server:
+
+npm run dev
+
+Open the local address shown by Vite in your browser. It is usually:
+
+http://localhost:5173/
+
+Build the Project
+
+To verify that the project compiles correctly, run:
+
+npm run build
+
+Author
+
+Josue Valle
