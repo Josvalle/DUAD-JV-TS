@@ -1,4 +1,4 @@
-import type {WeekDays,ExerciseMaxCalories,RoutineEntry,MaxCaloriesAccumulator} from '../types/Exercises'
+import type {WeekDays,ExerciseMaxCalories,RoutineEntry,MaxCaloriesAccumulator,CategorySeparation,ExerciseInform,ExerciseCategory,SummaryCategory} from '../types/Exercises'
 type CaloriesByDay = Partial<Record<WeekDays, number>>;
 
 export function obtainSpendTime(totalMinutes:number):string {
@@ -77,3 +77,56 @@ export function obtainDayWithMostCalories(entries: RoutineEntry[]): string | nul
 
     return `Dia con mas calorias de la rutina: ${maxDay[0]} Calorias: ${maxDay[1]}`
     }
+
+
+export function ExercisePerCategory(exercisesArray: RoutineEntry[] ):CategorySeparation{
+
+    const newExerciseArray: CategorySeparation = exercisesArray.reduce<CategorySeparation>((
+        accumulator: CategorySeparation,
+        currentExercise: RoutineEntry
+    ): CategorySeparation => {
+        const currentExerciseCategory:ExerciseInform = currentExercise.exersiceInfo
+        if(currentExerciseCategory.category === "Cardio"){
+            if (accumulator.Cardio ===undefined){
+                accumulator.Cardio = []
+            }
+            accumulator.Cardio?.push(currentExerciseCategory)
+        }else if (currentExerciseCategory.category === "Flexibilidad"){
+            if (accumulator.Flexibilidad === undefined){
+                accumulator.Flexibilidad = []
+            }
+            accumulator.Flexibilidad?.push(currentExerciseCategory)
+        }else if(currentExerciseCategory.category ==="Fuerza"){
+            if(accumulator.Fuerza === undefined){
+                accumulator.Fuerza = []
+            }
+            accumulator.Fuerza?.push(currentExerciseCategory)
+        }
+        
+        return accumulator
+    },{})
+
+    return newExerciseArray
+}
+
+export function categorySummary (categoryList: CategorySeparation, category:ExerciseCategory):SummaryCategory{
+    const summaryCalories = categoryList[category]?.reduce((accumulator:number,currentCalories)=>{
+        return accumulator + currentCalories.totalCalories
+    },0)??0
+
+    const summaryTime = categoryList[category]?.reduce((accumulator:number,currentTime)=>{
+        return accumulator + currentTime.minutes
+    },0)??0
+
+    const summaryExercises = categoryList[category]?.length ?? 0
+
+    return(
+        {
+            'summaryCalories':summaryCalories,
+            'summaryTime':summaryTime,
+            'summaryExercises':summaryExercises
+        }
+    )
+}
+
+

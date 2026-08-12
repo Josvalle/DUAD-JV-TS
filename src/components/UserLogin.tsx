@@ -1,10 +1,10 @@
-import type { UserLevel,UserInformation } from "../types/Users";
+import type { UserLevel,UserInformation,UserForm } from "../types/Users";
 import type { WeekRoutine } from "../types/Exercises";
 import {Formik, Form, Field, ErrorMessage} from 'formik'
 import type { Dispatch,SetStateAction } from "react";
 import * as Yup from 'yup'
 
-const initialUserValues:UserInformation={
+const initialUserValues:UserForm={
     name: '', age:0, level:'Principiante',routine:''
 }
 
@@ -29,13 +29,18 @@ interface UserFormLogin {
 function UserLogin({setUser,setWeekRoutine,WeekRoutine}:UserFormLogin){
     return(
             <div className="user-form">
-                <Formik <UserInformation>
+                <Formik <UserForm>
                     initialValues={initialUserValues}
                     validationSchema={objectValidation}
                     validateOnChange={false}
                     validateOnBlur={false}
                     onSubmit={(values,{resetForm})=>{
-                        setUser(values)
+                        const idValue = Date.now
+                        const newValues = {
+                            id: Number(idValue),
+                            ...values
+                        }
+                        setUser(newValues)
                         setWeekRoutine({...WeekRoutine,name:values.routine})
                         resetForm()
                     }

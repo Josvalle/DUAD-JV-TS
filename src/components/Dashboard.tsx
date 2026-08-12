@@ -1,10 +1,11 @@
 import { useState,useMemo } from "react";
 import '../styles/dashboard.css'
 import type {RoutineEntry, WeekRoutine} from '../types/Exercises'
-import type { UserInformation } from "../types/Users";
+import type { UserInformation, UserPlan } from "../types/Users";
 import UserLogin from "./UserLogin";
 import ExerciseFormInput from "./ExerciseFormInput";
-import { obtainSpendTime,obtainPace,obtainDayWithMostCalories, obtainAveragePerDay,obtainMaxCalories } from "../funcs/exersicesFunc";
+import ExerciseDashboard from "./ExerciseDashboard";
+import { obtainSpendTime,obtainDayWithMostCalories, obtainAveragePerDay,obtainMaxCalories } from "../funcs/exersicesFunc";
 
 
 
@@ -15,6 +16,12 @@ function MainPage(){
         name: '',
         exersices:[]
     })
+    const [userPlan] = useState<UserPlan>({
+        MembershipLevel: 'Premium',
+        StartDate: '08/05/2026',
+        UserStatus: 'Activo'
+    })
+
     const maxCalories = useMemo(() => {
         if (WeekRoutine.exersices.length === 0) {
             return null;
@@ -47,43 +54,28 @@ function MainPage(){
     }else {
         return(
             <div id="main-container">
-                <div id="profile-container">
-                    <h2 id="profile-title">👤 Perfil de Usuario </h2>
-                    <p className="profile-info" >Nombre: {user?.name}</p>
-                    <p className="profile-info" >Edad: {user?.age}</p>
-                    <p className="profile-info" >Nivel: {user?.level}</p>
+                <div id="user-information">
+                    <div className="profile-container">
+                        <h2 id="profile-title">👤 Perfil de Usuario </h2>
+                        <p className="profile-info" >Nombre: {user?.name}</p>
+                        <p className="profile-info" >Edad: {user?.age}</p>
+                        <p className="profile-info" >Nivel: {user?.level}</p>
+                    </div>
+                    <div className="profile-container">
+                        <h2 id="plan-title">🏋️‍♂️ Plan Actual</h2>
+                        <p className="profile-info">Membresia: {userPlan?.MembershipLevel} </p>
+                        <p className="profile-info">Fecha de Inicio: {userPlan?.StartDate}</p>
+                        <p className="profile-info">Estado actual: {userPlan?.UserStatus}</p>
+                    </div>
                 </div>
+                
                 <div id="exercise-container">
                     
                     <ExerciseFormInput 
                         setWeekRoutine={setWeekRoutine}
                     />
                     <div id="exercises-list">
-
-                        <table id="exercises-table">
-                            <thead id="exercise-table">
-                                <tr id='th-containers'>
-                                    <th className="th-exercise">Dia</th>
-                                    <th className="th-exercise">Ejercicio</th>
-                                    <th className="th-exercise">Mintuos de Ejercico</th>
-                                    <th className="th-exercise">Ritmo</th>
-                                    <th className="th-exercise">Calorias Quemadas</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    WeekRoutine.exersices.map((exercises: RoutineEntry, index:number)=>(
-                                        <tr key={index}className="exercise-row">
-                                            <td className="value-exer">{exercises.day}</td>
-                                            <td className="value-exer">{exercises.exersiceInfo.nameExercise}</td>
-                                            <td className="value-exer">{obtainSpendTime(exercises.exersiceInfo.minutes)}</td>
-                                            <td className="value-exer">{exercises.exersiceInfo.distance === null? '' : obtainPace(exercises.exersiceInfo.minutes,exercises.exersiceInfo.distance)}</td>
-                                            <td className="value-exer">{exercises.exersiceInfo.totalCalories}</td>
-                                        </tr>
-                                    ))
-                                }
-                            </tbody>
-                        </table>
+                        <ExerciseDashboard exersiceInfo={WeekRoutine.exersices}/>
                     </div>
                 </div>
                 <div id='average-container'>
