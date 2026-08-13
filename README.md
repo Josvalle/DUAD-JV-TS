@@ -4,7 +4,9 @@
 
 Register the user's name, age, experience level, and routine name.
 
-Register exercises by day of the week.
+Register exercises by day of the week and category.
+
+Display exercises by Category and summary of the exercises
 
 Calculate calories burned.
 

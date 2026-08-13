@@ -35,9 +35,9 @@ function UserLogin({setUser,setWeekRoutine,WeekRoutine}:UserFormLogin){
                     validateOnChange={false}
                     validateOnBlur={false}
                     onSubmit={(values,{resetForm})=>{
-                        const idValue = Date.now
+                        const idValue = Date.now()
                         const newValues = {
-                            id: Number(idValue),
+                            id: idValue,
                             ...values
                         }
                         setUser(newValues)
