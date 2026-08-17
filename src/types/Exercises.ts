@@ -1,10 +1,60 @@
 export type WeekDays = "Domingo" | "Lunes" | "Martes" | "Miercoles" | "Jueves" | "Viernes" | "Sabado"
 
-type calories = number
+export type calories = number
+
+export type ExerciseCategory = "Cardio" | "Fuerza" | "Flexibilidad"
+
+export interface CardioExercise extends BasicExerciseInfo{
+    category: 'Cardio'
+    distance: number;
+    rhythm:string;
+    FCmax:number
+}
+
+export interface StrengthExercise extends BasicExerciseInfo {
+    category: 'Fuerza'
+    sets:number;
+    reps:number;
+    weight:number;
+}
+
+export interface FlexExercise extends BasicExerciseInfo {
+    category:'Flexibilidad'
+    pose: string;
+    poseNumber:number;
+}
+
+interface BasicExerciseInfo {
+    nameExercise:string;
+    minutes:number;
+    caloriesPerMinute:calories
+    totalCalories:calories;
+}
+
+export interface ExerciseForm2 {
+    category: ExerciseCategory | "";
+    day: WeekDays
+    nameExercise: string;
+    minutes: number | ""
+    caloriesPerMinute:calories | ""
+
+    distance: number | "";
+    FCmax:number | "";
+
+    sets:number | "";
+    reps:number | "";
+    weight:number | "";
+
+    pose: string;
+    poseNumber:number | "";
+}
+
+export type ExerciseInform = CardioExercise | StrengthExercise | FlexExercise
+
 
 export interface RoutineEntry  {
     day:WeekDays;
-    exersiceInfo:ExerciseInfo
+    exersiceInfo:ExerciseInform
     
 }
 
@@ -43,6 +93,23 @@ export interface ExerciseMaxCalories {
 }
 
 export interface MaxCaloriesAccumulator {
-    totalCalories: number;
+    totalCalories: calories;
     exerciseMax: RoutineEntry;
+}
+
+
+export interface CategorySeparation {
+    Cardio?: CardioExercise[];
+    Fuerza?: StrengthExercise[];
+    Flexibilidad?: FlexExercise[];
+}
+
+export interface SummaryCategory{
+    summaryCalories:calories,
+    summaryTime:number,
+    summaryExercises:number
+}
+
+export interface ExerciseDashboardProps {
+    exersiceInfo: RoutineEntry[];
 }

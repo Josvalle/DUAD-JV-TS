@@ -69,6 +69,7 @@
     border: 1px solid lightgray;
     border-radius: 8px;
     height: 2em;
+    width: 23em;
 }
 #exercise-form{
     display: flex;
@@ -79,6 +80,7 @@
 
 #container-inputs{
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
@@ -121,14 +123,14 @@
     
 }
 
-#profile-container{
+.profile-container{
     display: flex;
     align-items: center;
     flex-direction: column;
     background-color: white;
     border-radius: 8px;
     height: auto;
-    width: 70%;
+    width: 100%;
     padding: 1em;
     margin: 1em;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -164,4 +166,16 @@
 
 #contain-exercises-stats{
     margin-left: 1em;
+}
+
+#user-information{
+    display: flex;
+    width: 70%;
+}
+
+#main-div-dashboard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
 }

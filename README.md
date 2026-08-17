@@ -4,7 +4,9 @@
 
 Register the user's name, age, experience level, and routine name.
 
-Register exercises by day of the week.
+Register exercises by day of the week and category.
+
+Display exercises by Category and summary of the exercises
 
 Calculate calories burned.
 
@@ -42,9 +44,13 @@ Open the local address shown by Vite in your browser. It is usually:
 
 http://localhost:5173/
 
-Build the Project
+## TypeScript Validation
 
-To verify that the project compiles correctly, run:
+To verify that TypeScript does not report errors, run:
+
+npx tsc --noEmit
+
+## Build the Project
 
 npm run build
 
