@@ -5,13 +5,14 @@ import type { Dispatch,SetStateAction } from "react";
 import * as Yup from 'yup'
 
 const initialUserValues:UserForm={
-    name: '', age:0, level:'Principiante',routine:''
+    name: '', age:0,email:'', level:'Principiante',routine:''
 }
 
 const objectValidation = Yup.object(
     {
         name: Yup.string().required('Por favor completa todos los campos'),
         age: Yup.number().required('Edad no puede estar en blanco '),
+        email: Yup.string().email().required('Email es necesario'),
         level: Yup.mixed<UserLevel>().oneOf(
             ["Principiante", "Intermedio", "Avanzado"],
             "Elige uno de los niveles disponibles").required("Nivel es obligatorio"),
@@ -59,6 +60,13 @@ function UserLogin({setUser,setWeekRoutine,WeekRoutine}:UserFormLogin){
                             <label htmlFor="age">Edad: </label>
                             <Field id="age" type="number" className="input-user-form" name='age' placehold='Por favor ingresa tu edad' ></Field>
                             <ErrorMessage name="age" component='p'></ErrorMessage>
+    
+                        </div>
+
+                        <div className="div-inside-form">
+                            <label htmlFor="email">Correo Electronico: </label>
+                            <Field id="email" className="input-user-form" name='email' placehold='Por favor ingresa su correo electronico' ></Field>
+                            <ErrorMessage name="email" component='p'></ErrorMessage>
     
                         </div>
                         

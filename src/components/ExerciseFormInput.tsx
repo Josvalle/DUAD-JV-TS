@@ -1,4 +1,4 @@
-import type { WeekDays, WeekRoutine,ExerciseForm2,ExerciseCategory, ExerciseInform,RoutineEntry  } from "../types/Exercises";
+import type { WeekDays, WeekRoutine,ExerciseForm2,ExerciseCategory, ExerciseInform,RoutineEntry,ExerciseStatus  } from "../types/Exercises";
 import * as Yup from 'yup'
 import {Formik, Form, Field, ErrorMessage} from 'formik'
 import type {FormikProps} from 'formik'
@@ -15,6 +15,8 @@ const initialValues:ExerciseForm2={
     nameExercise: "",
     minutes: "",
     caloriesPerMinute:"",
+    status:"No Completado",
+
 
     distance: "",
     FCmax:"",
@@ -37,6 +39,8 @@ const objectEValidation = Yup.object(
             "Elige uno de los niveles disponibles").required("Dia de la semana necesario"),
         category: Yup.mixed<ExerciseCategory>().oneOf(["Cardio","Flexibilidad","Fuerza"],
             "Elige una de las categorias disponibles").required("Categoria Necesaria"),
+        status: Yup.mixed<ExerciseStatus>().oneOf(['Completado','No Completado'],
+            "Elige uno de los estados para completar el ejercicio").required('Estado del ejercicio es obligatorio'),
         distance: Yup.number().when("category",{
             is:"Cardio",
             then: (schema: Yup.NumberSchema)=> schema.required("La distancia es obligatoria"),
@@ -101,7 +105,8 @@ function ExerciseFormInput({setWeekRoutine}:ExerciseFormAdd){
                                         "nameExercise":values.nameExercise, 
                                         "minutes":Number(values.minutes),
                                         "caloriesPerMinute":Number(values.caloriesPerMinute),
-                                        "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes), 
+                                        "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes),
+                                        "status":values.status,
                                         "category":'Cardio',
                                         "distance":Number(values.distance),
                                         "rhythm":obtainPace(Number(values.minutes),Number(values.distance)),
@@ -113,7 +118,8 @@ function ExerciseFormInput({setWeekRoutine}:ExerciseFormAdd){
                                         "nameExercise":values.nameExercise, 
                                         "minutes":Number(values.minutes),
                                         "caloriesPerMinute":Number(values.caloriesPerMinute),
-                                        "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes), 
+                                        "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes),
+                                        "status":values.status, 
                                         "category":'Fuerza',
                                         "sets":Number(values.sets),
                                         "reps":Number(values.reps),
@@ -124,7 +130,8 @@ function ExerciseFormInput({setWeekRoutine}:ExerciseFormAdd){
                                         "nameExercise":values.nameExercise, 
                                         "minutes":Number(values.minutes),
                                         "caloriesPerMinute":Number(values.caloriesPerMinute),
-                                        "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes), 
+                                        "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes),
+                                        "status":values.status, 
                                         "category":'Flexibilidad',
                                         "pose":values.pose,
                                         "poseNumber":Number(values.poseNumber)
@@ -188,6 +195,17 @@ function ExerciseFormInput({setWeekRoutine}:ExerciseFormAdd){
                                     <Field id="caloriesPerMinute" type="number" className="exercise-user-form" name='caloriesPerMinute' placeholder='Cantidad de cuántas calorías quema por minuto' ></Field>
                                     <ErrorMessage name="caloriesPerMinute" component='p'></ErrorMessage>
                                 </div>
+
+                                <div className="container-input-exer">
+                                    <label className="label-exer" htmlFor="status">Estado del Ejercicio: </label>
+                                    <Field as='select' id="status" className="exercise-user-form" name='status' >
+                                        <option value="No Completado">No Completado</option>
+                                        <option value="Completado">Completado</option>
+                                    </Field>
+                                    <ErrorMessage name="status" component='p'></ErrorMessage>
+                                </div>
+
+
                                 
                                 
                                     </>

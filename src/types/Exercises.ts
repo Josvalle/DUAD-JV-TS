@@ -1,4 +1,5 @@
 export type WeekDays = "Domingo" | "Lunes" | "Martes" | "Miercoles" | "Jueves" | "Viernes" | "Sabado"
+export type ExerciseStatus = "Completado" | "No Completado"
 
 export type calories = number
 
@@ -29,6 +30,7 @@ interface BasicExerciseInfo {
     minutes:number;
     caloriesPerMinute:calories
     totalCalories:calories;
+    status:ExerciseStatus 
 }
 
 export interface ExerciseForm2 {
@@ -37,6 +39,7 @@ export interface ExerciseForm2 {
     nameExercise: string;
     minutes: number | ""
     caloriesPerMinute:calories | ""
+    status:ExerciseStatus 
 
     distance: number | "";
     FCmax:number | "";

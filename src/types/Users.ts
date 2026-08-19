@@ -7,6 +7,7 @@ export interface UserInformation extends UserForm{
 export interface UserForm {
     name:string;
     age:number;
+    email:string;
     level:UserLevel;
     routine:string;
 }

@@ -59,6 +59,7 @@ function MainPage(){
                         <h2 id="profile-title">👤 Perfil de Usuario </h2>
                         <p className="profile-info" >Nombre: {user?.name}</p>
                         <p className="profile-info" >Edad: {user?.age}</p>
+                        <p className="profile-info" >Correo Electronico: {user?.email}</p>
                         <p className="profile-info" >Nivel: {user?.level}</p>
                     </div>
                     <div className="profile-container">
