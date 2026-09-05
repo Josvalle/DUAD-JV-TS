@@ -42,7 +42,7 @@ function UserLogin({setUser,setWeekRoutine,WeekRoutine}:UserFormLogin){
                             ...values
                         }
                         setUser(newValues)
-                        setWeekRoutine({...WeekRoutine,name:values.routine})
+                        setWeekRoutine({...WeekRoutine,weekRoutineName:values.routine})
                         resetForm()
                     }
                     }

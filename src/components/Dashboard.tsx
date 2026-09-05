@@ -1,20 +1,19 @@
 import { useState,useMemo } from "react";
 import '../styles/dashboard.css'
-import type {RoutineEntry, WeekRoutine} from '../types/Exercises'
+import type { WeekRoutine, MaxCaloriesAccumulator} from '../types/Exercises'
 import type { UserInformation, UserPlan } from "../types/Users";
 import UserLogin from "./UserLogin";
 import ExerciseFormInput from "./ExerciseFormInput";
 import ExerciseDashboard from "./ExerciseDashboard";
-import { obtainSpendTime,obtainDayWithMostCalories, obtainAveragePerDay,obtainMaxCalories } from "../funcs/exersicesFunc";
-
-
+import ExericsesList from "./ExercisesList";
+import InstructorPage from "./InstructorPage";
 
 
 function MainPage(){
     const [user, setUser] = useState<UserInformation | null>(null);
     const [WeekRoutine,setWeekRoutine] = useState<WeekRoutine>({
-        name: '',
-        exersices:[]
+        weekRoutineName: '',
+        sessions:[]
     })
     const [userPlan] = useState<UserPlan>({
         MembershipLevel: 'Premium',
@@ -22,27 +21,8 @@ function MainPage(){
         UserStatus: 'Activo'
     })
 
-    const maxCalories = useMemo(() => {
-        if (WeekRoutine.exersices.length === 0) {
-            return null;
-        }
 
-        return obtainMaxCalories(WeekRoutine.exersices);
-    }, [WeekRoutine.exersices]);
-
-
-    const maxTime = useMemo(() => {
-        if (WeekRoutine.exersices.length === 0) {
-            return null;
-        }
-
-        return WeekRoutine.exersices.reduce(
-            (longestExercise:RoutineEntry, currentExercise:RoutineEntry):RoutineEntry => currentExercise.exersiceInfo.minutes > longestExercise.exersiceInfo.minutes
-                    ? currentExercise
-                    : longestExercise
-                );
-            }, [WeekRoutine.exersices]);
-
+    
     if(user === null){
         return(
             <UserLogin  
@@ -71,31 +51,29 @@ function MainPage(){
                 </div>
                 
                 <div id="exercise-container">
-                    
                     <ExerciseFormInput 
                         setWeekRoutine={setWeekRoutine}
                     />
-                    <div id="exercises-list">
-                        <ExerciseDashboard exersiceInfo={WeekRoutine.exersices}/>
-                    </div>
                 </div>
-                <div id='average-container'>
-                    <h2>📊 Resumen comparativo</h2>
-                    <div id="stats-containter" >
-                            <div id="contain-week-routine">
-                            <h3 id="routine-name">Rutina: {WeekRoutine.name}</h3>
-                            <p id="average-per-day" >Promedio por dia entrenado: {obtainAveragePerDay(WeekRoutine.exersices).toFixed(2)} Calorias</p>
-                            <p id="routine-total">Total de Calorias: {maxCalories?.routineTotal}</p>
-                        </div>
-                        <div id="contain-exercises-stats" >
-                            {maxTime ? (<p className="summary-text" >Mayor duración: {maxTime.exersiceInfo.nameExercise} ({obtainSpendTime(maxTime.exersiceInfo.minutes)})</p>) : (<p className="summary-text">No hay ejercicios registrados</p>)}
-                            {maxCalories ? (<p className="summary-text" > Mas Calorias: {maxCalories?.name} ({maxCalories?.calories} Cal, {maxCalories?.percentaje.toFixed(2)}% del total)</p>): (<p className="summary-text">No hay ejercicios registrados</p>)}
-                            <p className="summary-text">{obtainDayWithMostCalories(WeekRoutine.exersices)}</p>
-                        </div>
-                    </div>
-                    
-                    
+                <div id="exercises-list">
+                    <h2>📋 Rutina: {WeekRoutine.weekRoutineName}</h2>
+                    <ExericsesList exersiceInfo={WeekRoutine.sessions}/>
                 </div>
+
+                <div id="week-summary">
+                    <h2>📊 Carga semanal</h2>
+                    <ExerciseDashboard sessions={WeekRoutine.sessions}  />
+                </div>
+                {user === null ? (
+                <div >
+                    
+                </div>): WeekRoutine.sessions.length === 0 ? (
+                    <div></div>
+                ): (<div id="instructor-container">
+                    <InstructorPage user={user} WeekRoutine={WeekRoutine}/>
+                </div>
+                ) }
+                
             </div>
             
 

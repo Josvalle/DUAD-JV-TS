@@ -1,3 +1,5 @@
+import type {MaxCaloriesAccumulator, WeekRoutine} from './Exercises'
+
 export type UserLevel = "Principiante" | "Intermedio" | "Avanzado"
 
 
@@ -22,3 +24,17 @@ export interface UserPlan{
     StartDate: string;
     UserStatus: Status
 }
+
+export interface ClientsInfo{
+    clientName: string;
+    clientLevel: UserLevel;
+    routineName:string;
+    weekRoutine:WeekRoutine;
+
+}
+
+export interface Instructor{
+    name:string;
+    clients:ClientsInfo[]
+}
+
