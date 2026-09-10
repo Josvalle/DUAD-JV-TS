@@ -1,4 +1,5 @@
-export type WeekDays = "Domingo" | "Lunes" | "Martes" | "Miercoles" | "Jueves" | "Viernes" | "Sabado"
+export type WeekDays = "Domingo" | "Lunes" | "Martes" | "Miercoles" | "Jueves" | "Viernes" | "Sabado" | ""
+export type ExerciseStatus = "Completado" | "No Completado"
 
 export type calories = number
 
@@ -29,14 +30,15 @@ interface BasicExerciseInfo {
     minutes:number;
     caloriesPerMinute:calories
     totalCalories:calories;
+    status:ExerciseStatus 
 }
 
 export interface ExerciseForm2 {
     category: ExerciseCategory | "";
-    day: WeekDays
     nameExercise: string;
     minutes: number | ""
     caloriesPerMinute:calories | ""
+    status:ExerciseStatus 
 
     distance: number | "";
     FCmax:number | "";
@@ -54,19 +56,17 @@ export type ExerciseInform = CardioExercise | StrengthExercise | FlexExercise
 
 export interface RoutineEntry  {
     day:WeekDays;
-    exersiceInfo:ExerciseInform
+    exersiceInfo:ExerciseInform[];
+    comment:string
     
 }
 
 export interface WeekRoutine {
-    name:string;
-    exersices:RoutineEntry[]
+    weekRoutineName:string;
+    sessions:RoutineEntry[]
 }
 
-export interface MaxCaloriesAccumulator {
-    totalCalories: number;
-    exerciseMax: RoutineEntry;
-}
+
 
 export interface ExerciseInfo {
     nameExercise:string;
@@ -94,7 +94,9 @@ export interface ExerciseMaxCalories {
 
 export interface MaxCaloriesAccumulator {
     totalCalories: calories;
-    exerciseMax: RoutineEntry;
+    totalMinutes: number;
+    amountOfDay:number
+    averageCalories:calories
 }
 
 
