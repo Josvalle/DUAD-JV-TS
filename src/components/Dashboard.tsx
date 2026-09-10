@@ -1,6 +1,7 @@
 import { useState,useMemo } from "react";
 import '../styles/dashboard.css'
-import type { WeekRoutine, MaxCaloriesAccumulator} from '../types/Exercises'
+import {obtainDayWithMostCalories,ExercisesNoComplete} from "../funcs/exersicesFunc"
+import type { WeekRoutine} from '../types/Exercises'
 import type { UserInformation, UserPlan } from "../types/Users";
 import UserLogin from "./UserLogin";
 import ExerciseFormInput from "./ExerciseFormInput";
@@ -20,6 +21,13 @@ function MainPage(){
         StartDate: '08/05/2026',
         UserStatus: 'Activo'
     })
+
+    const noCompleteExercises = useMemo(()=>{
+        if (WeekRoutine.sessions.length === 0){
+            return null
+        }
+        return ExercisesNoComplete(WeekRoutine.sessions)
+    },[])
 
 
     
@@ -63,6 +71,19 @@ function MainPage(){
                 <div id="week-summary">
                     <h2>📊 Carga semanal</h2>
                     <ExerciseDashboard sessions={WeekRoutine.sessions}  />
+                    <p className="summary-text">{obtainDayWithMostCalories(WeekRoutine.sessions)}</p>
+                    {WeekRoutine.sessions.length === 0 ? (
+                        <div id="container-no-complete-exercises">
+                            <h2>Ejercicios no completados: </h2>
+                            {noCompleteExercises?.map((item,id)=>{
+                                return(
+                                    <div id="details-no-complete" key={id}>
+                                        <p>{item.nameExercise}</p>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    ):(<div></div>)}
                 </div>
                 {user === null ? (
                 <div >

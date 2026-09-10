@@ -1,5 +1,5 @@
-import type {RoutineEntry,MaxCaloriesAccumulator,CategorySeparation,ExerciseInform,ExerciseCategory,SummaryCategory} from '../types/Exercises'
-//type CaloriesByDay = Partial<Record<WeekDays, number>>;
+import type {RoutineEntry,MaxCaloriesAccumulator,CategorySeparation,ExerciseInform,ExerciseCategory,SummaryCategory,WeekDays} from '../types/Exercises'
+type CaloriesByDay = Partial<Record<WeekDays, number>>;
 
 export function obtainSpendTime(totalMinutes:number):string {
     const hours = Math.floor(totalMinutes / 60);
@@ -49,6 +49,13 @@ export function obtainMaxCalories(exercises: RoutineEntry[]): MaxCaloriesAccumul
 
 
 
+export function ExercisesNoComplete(exercisesList: RoutineEntry[]){
+    const exercisePool:ExerciseInform[] = exercisesList.flatMap(exercise => exercise.exersiceInfo)
+    const noCompleteE = exercisePool.filter(e => e.status === "No Completado")
+    return noCompleteE
+}
+
+
 export function ExercisePerCategory(exercisesArray: RoutineEntry[] ):CategorySeparation{
     const allExercises: ExerciseInform[] = exercisesArray.flatMap(exercise => exercise.exersiceInfo)
     const newExerciseArray: CategorySeparation = allExercises.reduce<CategorySeparation>((
@@ -78,6 +85,37 @@ export function ExercisePerCategory(exercisesArray: RoutineEntry[] ):CategorySep
 
     return newExerciseArray
 }
+
+export function obtainDayWithMostCalories(entries: RoutineEntry[]): string | null {
+    const caloriesByDay = entries.reduce((groupedDays:CaloriesByDay, currentEntry:RoutineEntry):CaloriesByDay => {
+                const day = currentEntry.day;
+                const calories = currentEntry.exersiceInfo.reduce((accumlator:number, currentExercise: ExerciseInform): number=>{
+                    accumlator += currentExercise.totalCalories;
+                    return accumlator
+                },0)
+
+
+
+                groupedDays[day] = (groupedDays[day] ?? 0) + calories;
+
+                return groupedDays;
+            },{});
+
+    const days = Object.entries(caloriesByDay) as [WeekDays,number][];
+
+    if (days.length === 0) {
+        return null;
+    }
+
+    const maxDay = days.reduce((maximum:[WeekDays,number], currentDay:[WeekDays,number]):[WeekDays,number] => currentDay[1] > maximum[1] ? currentDay : maximum);
+
+    return `Dia con mas calorias de la rutina: ${maxDay[0]} Calorias: ${maxDay[1]}`
+    }
+
+
+
+
+
 
 export function categorySummary (categoryList: CategorySeparation, category:ExerciseCategory):SummaryCategory{
     const summaryCalories = categoryList[category]?.reduce((accumulator:number,currentCalories)=>{
