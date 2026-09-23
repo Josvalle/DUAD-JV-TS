@@ -1,3 +1,7 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 .user-form{
     min-height: 100vh;
     width: 100%;
@@ -71,6 +75,13 @@
     height: 2em;
     width: 23em;
 }
+
+.comment-area{
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    width: 23em;
+    height: 4em;
+}
 #exercise-form{
     display: flex;
     flex-direction: column;
@@ -90,7 +101,7 @@
 }
 
 
-#submit-exercises{
+.submit-exercises{
     background-color: #6a59b6;
     color: white;
     height: 2.5em;
@@ -98,9 +109,7 @@
     border-color: transparent;
     border-radius: 8px;
     font-weight: bold;
-    margin-bottom: 0.25em;
-    margin-top: 1em;
-    
+    margin: 0.75em;
 }
 
 #exercise-container{
@@ -178,4 +187,49 @@
     flex-direction: column;
     align-items: center;
     
+}
+
+#form-container-exercises{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#exercises-list{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    border-radius: 8px;
+    height: auto;
+    width: 70%;
+    padding: 1em;
+    margin-top: 2em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#week-summary{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    border-radius: 8px;
+    height: auto;
+    width: 70%;
+    padding: 1em;
+    margin-top: 2em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#instructor-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    border-radius: 8px;
+    height: auto;
+    width: 70%;
+    padding: 1em;
+    margin-top: 2em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

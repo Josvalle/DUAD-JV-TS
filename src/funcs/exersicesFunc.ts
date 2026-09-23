@@ -1,4 +1,4 @@
-import type {WeekDays,ExerciseMaxCalories,RoutineEntry,MaxCaloriesAccumulator,CategorySeparation,ExerciseInform,ExerciseCategory,SummaryCategory} from '../types/Exercises'
+import type {RoutineEntry,MaxCaloriesAccumulator,CategorySeparation,ExerciseInform,ExerciseCategory,SummaryCategory,WeekDays} from '../types/Exercises'
 type CaloriesByDay = Partial<Record<WeekDays, number>>;
 
 export function obtainSpendTime(totalMinutes:number):string {
@@ -19,48 +19,82 @@ export function obtainPace(totalMinutes:number, totalkilometers:number,):string 
     return `Ritmo: ${pace.toFixed(2)} min/km`;
 }
 
-export function obtainMaxCalories(exercises: RoutineEntry[]): ExerciseMaxCalories {
-    const result = exercises.reduce((amount:MaxCaloriesAccumulator, actualExercise:RoutineEntry):MaxCaloriesAccumulator => {
-            amount.totalCalories += actualExercise.exersiceInfo.totalCalories;
-
-            if (actualExercise.exersiceInfo.totalCalories > amount.exerciseMax.exersiceInfo.totalCalories) {
-                    amount.exerciseMax = actualExercise;
-                }
-
-                return amount;
-            },
-            {totalCalories: 0,exerciseMax: exercises[0]}
-        );
-
-    const percentaje = result.exerciseMax.exersiceInfo.totalCalories!==0 ? (result.exerciseMax.exersiceInfo.totalCalories / result.totalCalories) * 100 :0;
-    const exerciseObject = {
-        name: result.exerciseMax.exersiceInfo.nameExercise,
-        calories: result.exerciseMax.exersiceInfo.totalCalories,
-        routineTotal:result.totalCalories,
-        percentaje: percentaje
-    };
-
-    return exerciseObject;
-    }
-
-export function obtainAveragePerDay(exercise: RoutineEntry[]):number{
-    const trainedday = new Set(exercise.map((entry:RoutineEntry):string=>entry.day))
+export function obtainMaxCalories(exercises: RoutineEntry[]): MaxCaloriesAccumulator {
+        const trainedday = new Set(exercises.map((entry:RoutineEntry):string=>entry.day))
     
-    const amountOfDay = trainedday.size
+        const amountOfDay = trainedday.size
 
-    const totalCalories = exercise.reduce((count:number,actualC:RoutineEntry)=>{
-        count += actualC.exersiceInfo.totalCalories
+        const allExercises: ExerciseInform[] = exercises.flatMap(exercise => exercise.exersiceInfo)
+        const totalCalories = allExercises.reduce((count:number,actualC:ExerciseInform)=>{
+        count += actualC.totalCalories
         return count;
-    },0)
+        },0) 
 
-        const averageCalories:number = amountOfDay === 0 ? 0 : totalCalories/amountOfDay
-        return averageCalories
+        const totalMinutes =allExercises.reduce((count:number, actualTime:ExerciseInform)=>{
+            count += actualTime.minutes
+            return count
+        },0)
+
+        const averageCalories = totalCalories/amountOfDay
+
+
+        return {
+            totalCalories,
+            totalMinutes,
+            amountOfDay,
+            averageCalories
+        }
+
     }
+
+
+
+export function ExercisesNoComplete(exercisesList: RoutineEntry[]){
+    const exercisePool:ExerciseInform[] = exercisesList.flatMap(exercise => exercise.exersiceInfo)
+    const noCompleteE = exercisePool.filter(e => e.status === "No Completado")
+    return noCompleteE
+}
+
+
+export function ExercisePerCategory(exercisesArray: RoutineEntry[] ):CategorySeparation{
+    const allExercises: ExerciseInform[] = exercisesArray.flatMap(exercise => exercise.exersiceInfo)
+    const newExerciseArray: CategorySeparation = allExercises.reduce<CategorySeparation>((
+        accumulator: CategorySeparation,
+        currentExercise: ExerciseInform
+    ): CategorySeparation => {
+        
+        if(currentExercise.category === "Cardio"){
+            if (accumulator.Cardio ===undefined){
+                accumulator.Cardio = []
+            }
+            accumulator.Cardio?.push(currentExercise)
+        }else if (currentExercise.category === "Flexibilidad"){
+            if (accumulator.Flexibilidad === undefined){
+                accumulator.Flexibilidad = []
+            }
+            accumulator.Flexibilidad?.push(currentExercise)
+        }else if(currentExercise.category ==="Fuerza"){
+            if(accumulator.Fuerza === undefined){
+                accumulator.Fuerza = []
+            }
+            accumulator.Fuerza?.push(currentExercise)
+        }
+        
+        return accumulator
+    },{})
+
+    return newExerciseArray
+}
 
 export function obtainDayWithMostCalories(entries: RoutineEntry[]): string | null {
     const caloriesByDay = entries.reduce((groupedDays:CaloriesByDay, currentEntry:RoutineEntry):CaloriesByDay => {
                 const day = currentEntry.day;
-                const calories = currentEntry.exersiceInfo.totalCalories;
+                const calories = currentEntry.exersiceInfo.reduce((accumlator:number, currentExercise: ExerciseInform): number=>{
+                    accumlator += currentExercise.totalCalories;
+                    return accumlator
+                },0)
+
+
 
                 groupedDays[day] = (groupedDays[day] ?? 0) + calories;
 
@@ -79,35 +113,9 @@ export function obtainDayWithMostCalories(entries: RoutineEntry[]): string | nul
     }
 
 
-export function ExercisePerCategory(exercisesArray: RoutineEntry[] ):CategorySeparation{
 
-    const newExerciseArray: CategorySeparation = exercisesArray.reduce<CategorySeparation>((
-        accumulator: CategorySeparation,
-        currentExercise: RoutineEntry
-    ): CategorySeparation => {
-        const currentExerciseCategory:ExerciseInform = currentExercise.exersiceInfo
-        if(currentExerciseCategory.category === "Cardio"){
-            if (accumulator.Cardio ===undefined){
-                accumulator.Cardio = []
-            }
-            accumulator.Cardio?.push(currentExerciseCategory)
-        }else if (currentExerciseCategory.category === "Flexibilidad"){
-            if (accumulator.Flexibilidad === undefined){
-                accumulator.Flexibilidad = []
-            }
-            accumulator.Flexibilidad?.push(currentExerciseCategory)
-        }else if(currentExerciseCategory.category ==="Fuerza"){
-            if(accumulator.Fuerza === undefined){
-                accumulator.Fuerza = []
-            }
-            accumulator.Fuerza?.push(currentExerciseCategory)
-        }
-        
-        return accumulator
-    },{})
 
-    return newExerciseArray
-}
+
 
 export function categorySummary (categoryList: CategorySeparation, category:ExerciseCategory):SummaryCategory{
     const summaryCalories = categoryList[category]?.reduce((accumulator:number,currentCalories)=>{
