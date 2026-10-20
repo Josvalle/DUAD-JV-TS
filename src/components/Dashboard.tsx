@@ -16,6 +16,7 @@ function MainPage(){
         weekRoutineName: '',
         sessions:[]
     })
+    const [invalidNames,setInvalidNames] = useState<string[]>([])
     const [userPlan] = useState<UserPlan>({
         MembershipLevel: 'Premium',
         StartDate: '08/05/2026',
@@ -61,6 +62,8 @@ function MainPage(){
                 <div id="exercise-container">
                     <ExerciseFormInput 
                         setWeekRoutine={setWeekRoutine}
+                        level={user.level}
+                        setInvalidNames={setInvalidNames}
                     />
                 </div>
                 <div id="exercises-list">
@@ -70,7 +73,7 @@ function MainPage(){
 
                 <div id="week-summary">
                     <h2>📊 Carga semanal</h2>
-                    <ExerciseDashboard sessions={WeekRoutine.sessions}  />
+                    <ExerciseDashboard sessions={WeekRoutine.sessions} invalidNames={invalidNames} />
                     <p className="summary-text">{obtainDayWithMostCalories(WeekRoutine.sessions)}</p>
                     {WeekRoutine.sessions.length === 0 ? (
                         <div id="container-no-complete-exercises">

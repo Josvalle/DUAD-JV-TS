@@ -1,9 +1,13 @@
 export type WeekDays = "Domingo" | "Lunes" | "Martes" | "Miercoles" | "Jueves" | "Viernes" | "Sabado" | ""
-export type ExerciseStatus = "Completado" | "No Completado"
+export type ExerciseStatus = "Completado" | "Saltado" | "Pendiente"
 
 export type calories = number
 
+export type ExerciseSource = "local" | "api"
+
 export type ExerciseCategory = "Cardio" | "Fuerza" | "Flexibilidad"
+
+export type ExerciseCategoryFormat = "Cardio" | "Fuerza" | "Flexibilidad" | null
 
 export interface CardioExercise extends BasicExerciseInfo{
     category: 'Cardio'
@@ -31,6 +35,7 @@ interface BasicExerciseInfo {
     caloriesPerMinute:calories
     totalCalories:calories;
     status:ExerciseStatus 
+    source:ExerciseSource
 }
 
 export interface ExerciseForm2 {
@@ -110,6 +115,11 @@ export interface SummaryCategory{
     summaryCalories:calories,
     summaryTime:number,
     summaryExercises:number
+}
+
+export interface SourceCount {
+    local:number;
+    api:number;
 }
 
 export interface ExerciseDashboardProps {

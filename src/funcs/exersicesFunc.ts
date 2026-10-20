@@ -1,5 +1,11 @@
-import type {RoutineEntry,MaxCaloriesAccumulator,CategorySeparation,ExerciseInform,ExerciseCategory,SummaryCategory,WeekDays} from '../types/Exercises'
+import type {ExerciseForm2,ExerciseSource,SourceCount,RoutineEntry,MaxCaloriesAccumulator,CategorySeparation,ExerciseInform,ExerciseCategory,SummaryCategory,WeekDays} from '../types/Exercises'
 type CaloriesByDay = Partial<Record<WeekDays, number>>;
+
+export const weekDays: WeekDays[] = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"]
+
+export function obtainDay(value: string): WeekDays | undefined {
+    return weekDays.find((day) => day === value)
+}
 
 export function obtainSpendTime(totalMinutes:number):string {
     const hours = Math.floor(totalMinutes / 60);
@@ -51,7 +57,7 @@ export function obtainMaxCalories(exercises: RoutineEntry[]): MaxCaloriesAccumul
 
 export function ExercisesNoComplete(exercisesList: RoutineEntry[]){
     const exercisePool:ExerciseInform[] = exercisesList.flatMap(exercise => exercise.exersiceInfo)
-    const noCompleteE = exercisePool.filter(e => e.status === "No Completado")
+    const noCompleteE = exercisePool.filter(e => e.status === "Saltado")
     return noCompleteE
 }
 
@@ -101,7 +107,10 @@ export function obtainDayWithMostCalories(entries: RoutineEntry[]): string | nul
                 return groupedDays;
             },{});
 
-    const days = Object.entries(caloriesByDay) as [WeekDays,number][];
+    const days: [WeekDays, number][] = weekDays.flatMap((day) => {
+        const dayCalories = caloriesByDay[day]
+        return dayCalories === undefined ? [] : [[day, dayCalories]]
+    })
 
     if (days.length === 0) {
         return null;
@@ -138,3 +147,77 @@ export function categorySummary (categoryList: CategorySeparation, category:Exer
 }
 
 
+
+
+export function createExercise(values: ExerciseForm2, source: ExerciseSource): ExerciseInform | null {
+    const minutes = Number(values.minutes)
+    const caloriesPerMinute = Number(values.caloriesPerMinute)
+    const totalCalories = caloriesPerMinute * minutes
+
+    if (values.category === 'Cardio'){
+        return {
+            nameExercise: values.nameExercise,
+            minutes,
+            caloriesPerMinute,
+            totalCalories,
+            status: values.status,
+            source,
+            category: 'Cardio',
+            distance: Number(values.distance),
+            rhythm: obtainPace(minutes, Number(values.distance)),
+            FCmax: Number(values.FCmax)
+        }
+    }else if (values.category === 'Fuerza'){
+        return {
+            nameExercise: values.nameExercise,
+            minutes,
+            caloriesPerMinute,
+            totalCalories,
+            status: values.status,
+            source,
+            category: 'Fuerza',
+            sets: Number(values.sets),
+            reps: Number(values.reps),
+            weight: Number(values.weight)
+        }
+    }else if (values.category === 'Flexibilidad'){
+        return {
+            nameExercise: values.nameExercise,
+            minutes,
+            caloriesPerMinute,
+            totalCalories,
+            status: values.status,
+            source,
+            category: 'Flexibilidad',
+            pose: values.pose,
+            poseNumber: Number(values.poseNumber)
+        }
+    }
+    return null
+}
+
+export function createSession(day: WeekDays, exercises: ExerciseInform[], comment: string): RoutineEntry {
+    return {
+        day,
+        exersiceInfo: exercises,
+        comment
+    }
+}
+
+export function formatExerciseDetail(exercise: ExerciseInform): string {
+    if (exercise.category === 'Cardio'){
+        return `${exercise.rhythm} | Distancia: ${exercise.distance} km`
+    }else if (exercise.category === 'Fuerza'){
+        return `Volumen: ${exercise.sets * exercise.reps * exercise.weight} kg`
+    }
+    return `${exercise.poseNumber} poses`
+}
+
+export function countBySource(sessions: RoutineEntry[]): SourceCount {
+    const allExercises: ExerciseInform[] = sessions.flatMap(session => session.exersiceInfo)
+    const api = allExercises.filter(exercise => exercise.source === "api").length
+    return {
+        local: allExercises.length - api,
+        api
+    }
+}

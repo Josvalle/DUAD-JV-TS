@@ -1,6 +1,6 @@
-import type {MaxCaloriesAccumulator, WeekRoutine} from './Exercises'
+import type { WeekRoutine} from './Exercises'
 
-export type UserLevel = "Principiante" | "Intermedio" | "Avanzado"
+export type UserLevel = "beginner" | "intermediate" | "expert"
 
 
 export interface UserInformation extends UserForm{
