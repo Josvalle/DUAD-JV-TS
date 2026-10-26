@@ -15,10 +15,8 @@ export type ExercisesTypes = "cardio" | "olympic_weightlifting" | "plyometrics" 
 
 export type AvailableMuscles = "abdominals" | "abductors" | "adductors" | "biceps"| "calves" | "chest"| "forearms" | "glutes" | "hamstrings" | "lats" | "lower_back" | "middle_back" | "neck" | "quadriceps" | "traps" | "triceps"
 
-export interface ValidExercise extends ApiResponseBasic {
-    difficulty: string;
-    instructions?: string;
-    equipments?: string[];
-    safety_info?: string
+export interface InvalidExercise {
+    id: string;
+    name: string;
 }
 

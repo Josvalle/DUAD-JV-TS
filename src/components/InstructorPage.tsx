@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { obtainMaxCalories } from "../funcs/exersicesFunc";
+import { obtainMaxCalories } from "../funcs/exercisesFunc";
 import type { Instructor,UserInformation } from "../types/Users";
 import type { WeekRoutine } from "../types/Exercises";
 import '../styles/dashboard.css'

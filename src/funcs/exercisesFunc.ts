@@ -30,7 +30,7 @@ export function obtainMaxCalories(exercises: RoutineEntry[]): MaxCaloriesAccumul
     
         const amountOfDay = trainedday.size
 
-        const allExercises: ExerciseInform[] = exercises.flatMap(exercise => exercise.exersiceInfo)
+        const allExercises: ExerciseInform[] = exercises.flatMap(exercise => exercise.exerciseInfo)
         const totalCalories = allExercises.reduce((count:number,actualC:ExerciseInform)=>{
         count += actualC.totalCalories
         return count;
@@ -55,15 +55,15 @@ export function obtainMaxCalories(exercises: RoutineEntry[]): MaxCaloriesAccumul
 
 
 
-export function ExercisesNoComplete(exercisesList: RoutineEntry[]){
-    const exercisePool:ExerciseInform[] = exercisesList.flatMap(exercise => exercise.exersiceInfo)
+export function exercisesNoComplete(exercisesList: RoutineEntry[]){
+    const exercisePool:ExerciseInform[] = exercisesList.flatMap(exercise => exercise.exerciseInfo)
     const noCompleteE = exercisePool.filter(e => e.status === "Saltado")
     return noCompleteE
 }
 
 
-export function ExercisePerCategory(exercisesArray: RoutineEntry[] ):CategorySeparation{
-    const allExercises: ExerciseInform[] = exercisesArray.flatMap(exercise => exercise.exersiceInfo)
+export function exercisePerCategory(exercisesArray: RoutineEntry[] ):CategorySeparation{
+    const allExercises: ExerciseInform[] = exercisesArray.flatMap(exercise => exercise.exerciseInfo)
     const newExerciseArray: CategorySeparation = allExercises.reduce<CategorySeparation>((
         accumulator: CategorySeparation,
         currentExercise: ExerciseInform
@@ -95,7 +95,7 @@ export function ExercisePerCategory(exercisesArray: RoutineEntry[] ):CategorySep
 export function obtainDayWithMostCalories(entries: RoutineEntry[]): string | null {
     const caloriesByDay = entries.reduce((groupedDays:CaloriesByDay, currentEntry:RoutineEntry):CaloriesByDay => {
                 const day = currentEntry.day;
-                const calories = currentEntry.exersiceInfo.reduce((accumlator:number, currentExercise: ExerciseInform): number=>{
+                const calories = currentEntry.exerciseInfo.reduce((accumlator:number, currentExercise: ExerciseInform): number=>{
                     accumlator += currentExercise.totalCalories;
                     return accumlator
                 },0)
@@ -161,6 +161,7 @@ export function createExercise(values: ExerciseForm2, source: ExerciseSource): E
             caloriesPerMinute,
             totalCalories,
             status: values.status,
+            id: crypto.randomUUID(),
             source,
             category: 'Cardio',
             distance: Number(values.distance),
@@ -174,6 +175,7 @@ export function createExercise(values: ExerciseForm2, source: ExerciseSource): E
             caloriesPerMinute,
             totalCalories,
             status: values.status,
+            id: crypto.randomUUID(),
             source,
             category: 'Fuerza',
             sets: Number(values.sets),
@@ -187,6 +189,7 @@ export function createExercise(values: ExerciseForm2, source: ExerciseSource): E
             caloriesPerMinute,
             totalCalories,
             status: values.status,
+            id: crypto.randomUUID(),
             source,
             category: 'Flexibilidad',
             pose: values.pose,
@@ -199,7 +202,7 @@ export function createExercise(values: ExerciseForm2, source: ExerciseSource): E
 export function createSession(day: WeekDays, exercises: ExerciseInform[], comment: string): RoutineEntry {
     return {
         day,
-        exersiceInfo: exercises,
+        exerciseInfo: exercises,
         comment
     }
 }
@@ -209,12 +212,16 @@ export function formatExerciseDetail(exercise: ExerciseInform): string {
         return `${exercise.rhythm} | Distancia: ${exercise.distance} km`
     }else if (exercise.category === 'Fuerza'){
         return `Volumen: ${exercise.sets * exercise.reps * exercise.weight} kg`
+    }else if (exercise.category === 'Flexibilidad'){
+        return `${exercise.poseNumber} poses`
+    }else{
+        const unmappedExercise: never = exercise
+        return unmappedExercise
     }
-    return `${exercise.poseNumber} poses`
 }
 
 export function countBySource(sessions: RoutineEntry[]): SourceCount {
-    const allExercises: ExerciseInform[] = sessions.flatMap(session => session.exersiceInfo)
+    const allExercises: ExerciseInform[] = sessions.flatMap(session => session.exerciseInfo)
     const api = allExercises.filter(exercise => exercise.source === "api").length
     return {
         local: allExercises.length - api,

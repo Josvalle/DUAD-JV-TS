@@ -1,5 +1,5 @@
-import type { ApiResponseBasic, AvailableMuscles, ExercisePreset, ExercisesTypes } from "../types/External";
-import type { ExerciseCategoryFormat } from "../types/Exercises";
+import type { ApiResponseBasic, AvailableMuscles, ExercisePreset, ExercisesTypes, InvalidExercise } from "../types/External";
+import type { ExerciseCategory } from "../types/Exercises";
 
 export const muscles: AvailableMuscles[] = ["abdominals", "abductors", "adductors", "biceps", "calves", "chest", "forearms", "glutes", "hamstrings", "lats", "lower_back", "middle_back", "neck", "quadriceps", "traps", "triceps"]
 
@@ -7,18 +7,16 @@ export function obtainMuscle(value: string): AvailableMuscles | undefined {
     return muscles.find((muscle) => muscle === value)
 }
 
-export function separateExercises(data: unknown[]): {valid: ApiResponseBasic[], invalid: unknown[]} {
+export function separateExercises(data: unknown[]): {valid: ApiResponseBasic[], invalid: InvalidExercise[]} {
     const valid = data.filter(validExercise)
-    const invalid = data.filter((exercise) => !validExercise(exercise))
+    const invalid = data
+        .filter((exercise) => !validExercise(exercise))
+        .map((exercise): InvalidExercise => ({id: crypto.randomUUID(), name: obtainExerciseName(exercise)}))
     return {valid, invalid}
 }
 
-export function createPreset(exercise: ApiResponseBasic): ExercisePreset | null {
-    const category = formatValues(exercise.type)
-    if (category === null){
-        return null
-    }
-    return {nameExercise: exercise.name, category}
+export function createPreset(exercise: ApiResponseBasic): ExercisePreset {
+    return {nameExercise: exercise.name, category: formatValues(exercise.type)}
 }
 
 export function validExercise (exercise: unknown): exercise is ApiResponseBasic {
@@ -39,6 +37,10 @@ export function validExercise (exercise: unknown): exercise is ApiResponseBasic 
         return false
     }
 
+    if (!(muscles.some((muscle)=>muscle === exercise.muscle))){
+        return false
+    }
+
     if ( exercise.name.trim() === "" ||  exercise.type.trim() === "" ||  exercise.muscle.trim() === ""){
         return false
     }
@@ -55,17 +57,15 @@ export function obtainExerciseName(exercise: unknown): string {
 }
 
 
-export function formatValues(exerciseType: ExercisesTypes): ExerciseCategoryFormat{
-    let category: ExerciseCategoryFormat
+export function formatValues(exerciseType: ExercisesTypes): ExerciseCategory{
     if (exerciseType === "cardio"){
-        category = "Cardio"
+        return "Cardio"
     }else if ( exerciseType === "stretching"){
-        category = "Flexibilidad"
+        return "Flexibilidad"
     }else if (exerciseType === "olympic_weightlifting" || exerciseType === "plyometrics" || exerciseType === "strongman" || exerciseType === "powerlifting" || exerciseType === "strength"){
-        category = "Fuerza"
+        return "Fuerza"
     }else{
-        category = null
+        const unmappedType: never = exerciseType
+        return unmappedType
     }
-
-    return category
 }

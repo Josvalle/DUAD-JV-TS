@@ -7,8 +7,6 @@ export type ExerciseSource = "local" | "api"
 
 export type ExerciseCategory = "Cardio" | "Fuerza" | "Flexibilidad"
 
-export type ExerciseCategoryFormat = "Cardio" | "Fuerza" | "Flexibilidad" | null
-
 export interface CardioExercise extends BasicExerciseInfo{
     category: 'Cardio'
     distance: number;
@@ -30,6 +28,7 @@ export interface FlexExercise extends BasicExerciseInfo {
 }
 
 interface BasicExerciseInfo {
+    id:string;
     nameExercise:string;
     minutes:number;
     caloriesPerMinute:calories
@@ -61,7 +60,7 @@ export type ExerciseInform = CardioExercise | StrengthExercise | FlexExercise
 
 export interface RoutineEntry  {
     day:WeekDays;
-    exersiceInfo:ExerciseInform[];
+    exerciseInfo:ExerciseInform[];
     comment:string
     
 }
@@ -72,30 +71,6 @@ export interface WeekRoutine {
 }
 
 
-
-export interface ExerciseInfo {
-    nameExercise:string;
-    minutes:number;
-    caloriesPerMinute:calories
-    totalCalories:calories;
-    distance: number | null;
-
-}
-
-export interface ExerciseForm {
-    day:WeekDays;
-    nameExercise:string;
-    minutes:number | string;
-    caloriesPerMinute:calories | string;
-    distance: number | string;
-}
-
-export interface ExerciseMaxCalories {
-    name: string;
-    calories:calories;
-    routineTotal:number;
-    percentaje:number;
-}
 
 export interface MaxCaloriesAccumulator {
     totalCalories: calories;
@@ -123,5 +98,5 @@ export interface SourceCount {
 }
 
 export interface ExerciseDashboardProps {
-    exersiceInfo: RoutineEntry[];
+    exerciseInfo: RoutineEntry[];
 }

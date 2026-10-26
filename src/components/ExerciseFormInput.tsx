@@ -1,9 +1,9 @@
-import type { WeekDays, WeekRoutine, ExerciseInform  } from "../types/Exercises";
+import type { WeekDays, WeekRoutine, ExerciseInform, ExerciseSource  } from "../types/Exercises";
 import { useState, type Dispatch,type SetStateAction } from "react";
 import AddOfExercises from "./AddOfExercise";
 import ApiExercises from "./ApiExercises";
-import { createSession, obtainDay } from "../funcs/exersicesFunc";
-import type { ExercisePreset } from "../types/External";
+import { createSession, obtainDay } from "../funcs/exercisesFunc";
+import type { ExercisePreset, InvalidExercise } from "../types/External";
 import type { UserLevel } from "../types/Users";
 import '../styles/dashboard.css'
 
@@ -12,7 +12,8 @@ import '../styles/dashboard.css'
 interface ExerciseFormAdd{
     setWeekRoutine: Dispatch<SetStateAction<WeekRoutine>>;
     level: UserLevel;
-    setInvalidNames: Dispatch<SetStateAction<string[]>>;
+    invalidExercises: InvalidExercise[];
+    setInvalidExercises: Dispatch<SetStateAction<InvalidExercise[]>>;
 
 
 }
@@ -20,14 +21,14 @@ interface ExerciseFormAdd{
 
 
 
-function ExerciseFormInput({setWeekRoutine,level,setInvalidNames}:ExerciseFormAdd){
+function ExerciseFormInput({setWeekRoutine,level,invalidExercises,setInvalidExercises}:ExerciseFormAdd){
     const [day,setDay] = useState<WeekDays>("");
     const [exercises,setExercises] = useState<ExerciseInform[]>([])
     const [comment,setComment] = useState<string>("")
-    const [source,setSource] = useState<"local" | "api">("local")
+    const [source,setSource] = useState<ExerciseSource>("local")
     const [preset,setPreset] = useState<ExercisePreset | null>(null)
 
-    function AddSession(){
+    function addSession(){
         
         const session = createSession(day, exercises, comment)
         
@@ -67,7 +68,7 @@ function ExerciseFormInput({setWeekRoutine,level,setInvalidNames}:ExerciseFormAd
 
                 {source === "api" && (
                     <div hidden={preset !== null}>
-                        <ApiExercises level={level} setPreset={setPreset} setInvalidNames={setInvalidNames}/>
+                        <ApiExercises level={level} setPreset={setPreset} invalidExercises={invalidExercises} setInvalidExercises={setInvalidExercises}/>
                     </div>
                 )}
 
@@ -80,7 +81,7 @@ function ExerciseFormInput({setWeekRoutine,level,setInvalidNames}:ExerciseFormAd
 
                 <textarea className="comment-area" value={comment} onChange={(e)=> setComment(e.target.value)}/>
                 <div className="buttons-exercises-input">
-                    <button className="submit-exercises" onClick={AddSession}>Terminar Session</button>
+                    <button className="submit-exercises" onClick={addSession}>Terminar Session</button>
                     <button className="submit-exercises" onClick={()=>setDay("")}>Cancelar</button>
                 </div>
                 

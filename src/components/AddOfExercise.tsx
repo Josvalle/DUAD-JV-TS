@@ -3,8 +3,8 @@ import * as Yup from 'yup'
 import type {FormikProps} from 'formik'
 import CardioFields from "./CardioForm";
 import StrenghtFields from "./StrenghtFields";
-import FlexFlields from "./FlexFlieds";
-import { createExercise } from "../funcs/exersicesFunc";
+import FlexFields from "./FlexFields";
+import { createExercise } from "../funcs/exercisesFunc";
 import type { ExerciseForm2,ExerciseCategory, ExerciseInform,ExerciseStatus  } from "../types/Exercises";
 import type { Dispatch, SetStateAction } from 'react';
 import type { ExercisePreset } from '../types/External';
@@ -160,7 +160,7 @@ function AddOfExercises({setExercises,preset,setPreset}:AddExercises){
                                     <StrenghtFields />
                                 )}
                                 {formik.values.category === "Flexibilidad" && (
-                                    <FlexFlields />
+                                    <FlexFields />
                                 )}
                             </div>
                             

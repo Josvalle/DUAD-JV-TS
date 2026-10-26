@@ -54,13 +54,15 @@ http://localhost:5173/
 
 Create a .env file in the root of the project:
 
-VITE_NINJA_API=https://api.api-ninjas.com/v1/exercises?
+VITE_NINJA_API=https://api.api-ninjas.com/v1/exercises
 
 VITE_API_KEY=your_api_key_here
 
 You can get a free key at https://api-ninjas.com. The .env file is ignored by git, so the key is never committed.
 
 Restart the development server after changing the .env file.
+
+Vite includes every variable that starts with VITE_ in the JavaScript sent to the browser, so anyone can read the key from the browser. This is acceptable for this exercise, but in a real project the request should go through a backend that keeps the key private and forwards the call to the API.
 
 ## TypeScript Validation
 

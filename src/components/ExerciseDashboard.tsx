@@ -1,6 +1,7 @@
 
-import { obtainMaxCalories,categorySummary, ExercisePerCategory, formatExerciseDetail, countBySource } from "../funcs/exersicesFunc"
+import { obtainMaxCalories,categorySummary, exercisePerCategory, formatExerciseDetail, countBySource } from "../funcs/exercisesFunc"
 
+import type { InvalidExercise } from "../types/External"
 import type { RoutineEntry, ExerciseCategory, ExerciseInform } from "../types/Exercises"
 
 const categoryIcons: Record<ExerciseCategory, string> = {
@@ -13,15 +14,15 @@ const categories: ExerciseCategory[] = ["Cardio", "Fuerza", "Flexibilidad"]
 
 interface ExerciseInformation{
     sessions : RoutineEntry[]
-    invalidNames : string[]
+    invalidExercises : InvalidExercise[]
     
 }
 
-function ExerciseDashboard({sessions,invalidNames}: ExerciseInformation){
+function ExerciseDashboard({sessions,invalidExercises}: ExerciseInformation){
     const weekValues = obtainMaxCalories(sessions)
-    const categoryExercises = ExercisePerCategory(sessions)
+    const categoryExercises = exercisePerCategory(sessions)
     const cardioCategory = categorySummary(categoryExercises,'Cardio')
-    const strenghCategory = categorySummary(categoryExercises,'Fuerza')
+    const strengthCategory = categorySummary(categoryExercises,'Fuerza')
     const flexCategory = categorySummary(categoryExercises,'Flexibilidad')
     const sourceCount = countBySource(sessions)
 
@@ -29,7 +30,7 @@ function ExerciseDashboard({sessions,invalidNames}: ExerciseInformation){
         <div>
             <p>Tiempo total: {weekValues.totalMinutes} | Total Calorias:  {weekValues.totalCalories}</p>
             <p>Dia entrenado: {weekValues.amountOfDay} | Promedio de Calorias por dia: {weekValues.averageCalories} </p>
-            <p>🏃 Cardio: {cardioCategory.summaryTime} Min | 💪 Fuerza: {strenghCategory.summaryTime} Min | 🧘 Flexibilidad: {flexCategory.summaryTime} Min </p>
+            <p>🏃 Cardio: {cardioCategory.summaryTime} Min | 💪 Fuerza: {strengthCategory.summaryTime} Min | 🧘 Flexibilidad: {flexCategory.summaryTime} Min </p>
             { weekValues.totalMinutes > 300 ? (
                 <p> Dia de descanso Obligatorio</p>
             ) : weekValues.amountOfDay > 5 ? (
@@ -49,8 +50,8 @@ function ExerciseDashboard({sessions,invalidNames}: ExerciseInformation){
                 return(
                     <div key={category}>
                         <p>{categoryIcons[category]} {category} ({list.length} {list.length === 1 ? "ejercicio" : "ejercicios"})</p>
-                        {list.map((exercise: ExerciseInform, index: number) => (
-                            <p key={index} className="list-exercise-information">{exercise.nameExercise}, {exercise.minutes} min | {formatExerciseDetail(exercise)}</p>
+                        {list.map((exercise: ExerciseInform) => (
+                            <p key={exercise.id} className="list-exercise-information">{exercise.nameExercise}, {exercise.minutes} min | {formatExerciseDetail(exercise)}</p>
                         ))}
                     </div>
                 )
@@ -58,11 +59,11 @@ function ExerciseDashboard({sessions,invalidNames}: ExerciseInformation){
             <p>Total: {sourceCount.local + sourceCount.api} ejercicios, {weekValues.totalMinutes} min</p>
             <p>Catálogo local: {sourceCount.local} ejercicios | Desde API: {sourceCount.api} ejercicios</p>
 
-            {invalidNames.length > 0 && (
+            {invalidExercises.length > 0 && (
                 <div>
-                    <h3>⚠️ Ejercicios con datos incompletos ({invalidNames.length})</h3>
-                    {invalidNames.map((name: string, index: number) => (
-                        <p key={index}>{name}, campos requeridos faltantes</p>
+                    <h3>⚠️ Ejercicios con datos incompletos ({invalidExercises.length})</h3>
+                    {invalidExercises.map((exercise: InvalidExercise) => (
+                        <p key={exercise.id}>{exercise.name}, campos requeridos faltantes</p>
                     ))}
                 </div>
             )}
