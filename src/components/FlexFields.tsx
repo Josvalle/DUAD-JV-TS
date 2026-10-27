@@ -1,6 +1,6 @@
 import { Field,ErrorMessage } from "formik"
 
-function FlexFlields(){
+function FlexFields(){
     return(
         <>
             <div className="container-input-exer">
@@ -17,4 +17,4 @@ function FlexFlields(){
     )
 }
 
-export default FlexFlields
+export default FlexFields

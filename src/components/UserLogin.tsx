@@ -5,7 +5,7 @@ import type { Dispatch,SetStateAction } from "react";
 import * as Yup from 'yup'
 
 const initialUserValues:UserForm={
-    name: '', age:0,email:'', level:'Principiante',routine:''
+    name: '', age:0,email:'', level:'beginner',routine:''
 }
 
 const objectValidation = Yup.object(
@@ -14,7 +14,7 @@ const objectValidation = Yup.object(
         age: Yup.number().required('Edad no puede estar en blanco '),
         email: Yup.string().email().required('Email es necesario'),
         level: Yup.mixed<UserLevel>().oneOf(
-            ["Principiante", "Intermedio", "Avanzado"],
+            ["beginner", "intermediate", "expert"],
             "Elige uno de los niveles disponibles").required("Nivel es obligatorio"),
         routine: Yup.string().required('Por favor completa todos los campos'),
     }
@@ -73,9 +73,9 @@ function UserLogin({setUser,setWeekRoutine,WeekRoutine}:UserFormLogin){
                         <div className="div-inside-form">
                             <label htmlFor="level">Experiencia: </label>
                             <Field as='select' id="level" className="input-user-form" name='level' >
-                                <option value="Principiante">Principiante</option>
-                                <option value="Intermedio">Intermedio</option>
-                                <option value="Avanzado">Avanzado</option>
+                                <option value="beginner">Principiante</option>
+                                <option value="intermediate">Intermedio</option>
+                                <option value="expert">Avanzado</option>
                             </Field>
                             <ErrorMessage name="level" component='p'></ErrorMessage>
                         </div>

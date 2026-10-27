@@ -3,10 +3,11 @@ import * as Yup from 'yup'
 import type {FormikProps} from 'formik'
 import CardioFields from "./CardioForm";
 import StrenghtFields from "./StrenghtFields";
-import FlexFlields from "./FlexFlieds";
-import { obtainPace } from "../funcs/exersicesFunc";
+import FlexFields from "./FlexFields";
+import { createExercise } from "../funcs/exercisesFunc";
 import type { ExerciseForm2,ExerciseCategory, ExerciseInform,ExerciseStatus  } from "../types/Exercises";
 import type { Dispatch, SetStateAction } from 'react';
+import type { ExercisePreset } from '../types/External';
 
 
 const initialValues:ExerciseForm2={
@@ -14,7 +15,7 @@ const initialValues:ExerciseForm2={
     nameExercise: "",
     minutes: "",
     caloriesPerMinute:"",
-    status:"No Completado",
+    status:"Pendiente",
 
 
     distance: "",
@@ -36,7 +37,7 @@ const objectEValidation = Yup.object(
         caloriesPerMinute:Yup.number().required('Por favor ingresa la cantidad de calorias por minuto para este ejericio'),
         category: Yup.mixed<ExerciseCategory>().oneOf(["Cardio","Flexibilidad","Fuerza"],
             "Elige una de las categorias disponibles").required("Categoria Necesaria"),
-        status: Yup.mixed<ExerciseStatus>().oneOf(['Completado','No Completado'],
+        status: Yup.mixed<ExerciseStatus>().oneOf(['Completado','Pendiente','Saltado'],
             "Elige uno de los estados para completar el ejercicio").required('Estado del ejercicio es obligatorio'),
         distance: Yup.number().when("category",{
             is:"Cardio",
@@ -79,65 +80,33 @@ const objectEValidation = Yup.object(
 
 interface AddExercises{
     setExercises:Dispatch<SetStateAction<ExerciseInform[]>>
+    preset: ExercisePreset | null
+    setPreset: Dispatch<SetStateAction<ExercisePreset | null>>
 }
 
 
-function AddOfExercises({setExercises}:AddExercises){
+function AddOfExercises({setExercises,preset,setPreset}:AddExercises){
+    const startValues: ExerciseForm2 = preset === null ? initialValues : {...initialValues, nameExercise: preset.nameExercise, category: preset.category}
+
     return(
         <Formik <ExerciseForm2>
-                        initialValues={initialValues}
+                        enableReinitialize
+                        initialValues={startValues}
                         validationSchema={objectEValidation}
                         validateOnBlur={false}
                         validateOnChange={false}
                         onSubmit={(values, {resetForm})=>{
                                 
                                 
-                                let exerciseValues:ExerciseInform;
-
-                                if(values.category === 'Cardio'){
-                                    exerciseValues = {
-                                        "nameExercise":values.nameExercise, 
-                                        "minutes":Number(values.minutes),
-                                        "caloriesPerMinute":Number(values.caloriesPerMinute),
-                                        "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes),
-                                        "status":values.status,
-                                        "category":'Cardio',
-                                        "distance":Number(values.distance),
-                                        "rhythm":obtainPace(Number(values.minutes),Number(values.distance)),
-                                        "FCmax":Number(values.FCmax)
-                                    }
-                                    
-                                }else if (values.category === 'Fuerza'){
-                                    exerciseValues = {
-                                        "nameExercise":values.nameExercise, 
-                                        "minutes":Number(values.minutes),
-                                        "caloriesPerMinute":Number(values.caloriesPerMinute),
-                                        "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes),
-                                        "status":values.status, 
-                                        "category":'Fuerza',
-                                        "sets":Number(values.sets),
-                                        "reps":Number(values.reps),
-                                        "weight":Number(values.weight)
-                                    }
-                                }else if (values.category === 'Flexibilidad'){
-                                    exerciseValues = {
-                                        "nameExercise":values.nameExercise, 
-                                        "minutes":Number(values.minutes),
-                                        "caloriesPerMinute":Number(values.caloriesPerMinute),
-                                        "totalCalories":Number(values.caloriesPerMinute)*Number(values.minutes),
-                                        "status":values.status, 
-                                        "category":'Flexibilidad',
-                                        "pose":values.pose,
-                                        "poseNumber":Number(values.poseNumber)
-                                    
-                                    }
-                                }else{
+                                const exerciseValues = createExercise(values, preset === null ? 'local' : 'api')
+                                if (exerciseValues === null){
                                     return
                                 }
-                                
+
                                 setExercises((previous)=> [...previous,exerciseValues])
 
                                 resetForm();
+                                setPreset(null)
                                 
                                 }}
                     >{(formik: FormikProps<ExerciseForm2>)=>(
@@ -145,7 +114,7 @@ function AddOfExercises({setExercises}:AddExercises){
                             <div id="container-inputs">
                                 <div className="container-input-exer">
                                     <label className="label-exer" htmlFor="category">Selecciona una Categoria</label>
-                                    <Field as='select' id="category" className="exercise-user-form" name='category'>
+                                    <Field as='select' id="category" className="exercise-user-form" name='category' disabled={preset !== null}>
                                         <option value="">Selecciona una Categoria</option>
                                         <option value="Cardio">Cardio</option>
                                         <option value="Fuerza">Fuerza</option>
@@ -175,8 +144,9 @@ function AddOfExercises({setExercises}:AddExercises){
                                         <div className="container-input-exer">
                                             <label className="label-exer" htmlFor="status">Estado del Ejercicio: </label>
                                             <Field as='select' id="status" className="exercise-user-form" name='status' >
-                                                <option value="No Completado">No Completado</option>
+                                                <option value="Pendiente">Pendiente</option>
                                                 <option value="Completado">Completado</option>
+                                                <option value="Saltado">Saltado</option>
                                             </Field>
                                             <ErrorMessage name="status" component='p'></ErrorMessage>
                                         </div>
@@ -190,17 +160,22 @@ function AddOfExercises({setExercises}:AddExercises){
                                     <StrenghtFields />
                                 )}
                                 {formik.values.category === "Flexibilidad" && (
-                                    <FlexFlields />
+                                    <FlexFields />
                                 )}
                             </div>
                             
                             
                             
-                            <button 
-                            type="submit" 
-                            className="submit-exercises"
-                            
-                            >Agregar ejercicio</button>
+                            <div className="buttons-exercises-input">
+                                <button 
+                                type="submit" 
+                                className="submit-exercises"
+                                
+                                >Agregar ejercicio</button>
+                                {preset !== null && (
+                                    <button type="button" className="submit-exercises" onClick={()=>setPreset(null)}>Cancelar selección</button>
+                                )}
+                            </div>
 
                         </Form>
                     )}

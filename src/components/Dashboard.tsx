@@ -1,7 +1,8 @@
 import { useState,useMemo } from "react";
 import '../styles/dashboard.css'
-import {obtainDayWithMostCalories,ExercisesNoComplete} from "../funcs/exersicesFunc"
+import {obtainDayWithMostCalories,exercisesNoComplete} from "../funcs/exercisesFunc"
 import type { WeekRoutine} from '../types/Exercises'
+import type { InvalidExercise } from '../types/External'
 import type { UserInformation, UserPlan } from "../types/Users";
 import UserLogin from "./UserLogin";
 import ExerciseFormInput from "./ExerciseFormInput";
@@ -16,6 +17,7 @@ function MainPage(){
         weekRoutineName: '',
         sessions:[]
     })
+    const [invalidExercises,setInvalidExercises] = useState<InvalidExercise[]>([])
     const [userPlan] = useState<UserPlan>({
         MembershipLevel: 'Premium',
         StartDate: '08/05/2026',
@@ -26,7 +28,7 @@ function MainPage(){
         if (WeekRoutine.sessions.length === 0){
             return null
         }
-        return ExercisesNoComplete(WeekRoutine.sessions)
+        return exercisesNoComplete(WeekRoutine.sessions)
     },[])
 
 
@@ -61,16 +63,19 @@ function MainPage(){
                 <div id="exercise-container">
                     <ExerciseFormInput 
                         setWeekRoutine={setWeekRoutine}
+                        level={user.level}
+                        invalidExercises={invalidExercises}
+                        setInvalidExercises={setInvalidExercises}
                     />
                 </div>
                 <div id="exercises-list">
                     <h2>📋 Rutina: {WeekRoutine.weekRoutineName}</h2>
-                    <ExericsesList exersiceInfo={WeekRoutine.sessions}/>
+                    <ExericsesList exerciseInfo={WeekRoutine.sessions}/>
                 </div>
 
                 <div id="week-summary">
                     <h2>📊 Carga semanal</h2>
-                    <ExerciseDashboard sessions={WeekRoutine.sessions}  />
+                    <ExerciseDashboard sessions={WeekRoutine.sessions} invalidExercises={invalidExercises} />
                     <p className="summary-text">{obtainDayWithMostCalories(WeekRoutine.sessions)}</p>
                     {WeekRoutine.sessions.length === 0 ? (
                         <div id="container-no-complete-exercises">
