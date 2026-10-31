@@ -28,7 +28,8 @@ export interface FlexExercise extends BasicExerciseInfo {
 }
 
 interface BasicExerciseInfo {
-    id:string;
+    id:number;
+    userId:number;
     nameExercise:string;
     minutes:number;
     caloriesPerMinute:calories
@@ -63,6 +64,19 @@ export interface RoutineEntry  {
     exerciseInfo:ExerciseInform[];
     comment:string
     
+}
+
+export interface StoredSession {
+    day:WeekDays;
+    exerciseIds:number[];
+    comment:string;
+}
+
+export interface StoredRoutine {
+    id:number;
+    userId:number;
+    name:string;
+    sessions:StoredSession[];
 }
 
 export interface WeekRoutine {

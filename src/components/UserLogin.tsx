@@ -1,95 +1,57 @@
-import type { UserLevel,UserInformation,UserForm } from "../types/Users";
-import type { WeekRoutine } from "../types/Exercises";
 import {Formik, Form, Field, ErrorMessage} from 'formik'
 import type { Dispatch,SetStateAction } from "react";
 import * as Yup from 'yup'
+import { loginUser } from "../funcs/systemFunc";
 
-const initialUserValues:UserForm={
-    name: '', age:0,email:'', level:'beginner',routine:''
+interface LoginForm {
+    email:string;
 }
 
-const objectValidation = Yup.object(
+const initialLoginValues:LoginForm={
+    email: ''
+}
+
+const loginValidation = Yup.object(
     {
-        name: Yup.string().required('Por favor completa todos los campos'),
-        age: Yup.number().required('Edad no puede estar en blanco '),
-        email: Yup.string().email().required('Email es necesario'),
-        level: Yup.mixed<UserLevel>().oneOf(
-            ["beginner", "intermediate", "expert"],
-            "Elige uno de los niveles disponibles").required("Nivel es obligatorio"),
-        routine: Yup.string().required('Por favor completa todos los campos'),
+        email: Yup.string().email('Ingresa un correo valido').required('Email es necesario'),
     }
 )
 
 interface UserFormLogin {
-    setUser: Dispatch<SetStateAction<UserInformation | null >>;
-    setWeekRoutine: Dispatch<SetStateAction<WeekRoutine>>;
-    WeekRoutine: WeekRoutine;
+    setCurrentUserId: Dispatch<SetStateAction<number | null>>;
+    goToRegister: () => void;
 }
 
 
-function UserLogin({setUser,setWeekRoutine,WeekRoutine}:UserFormLogin){
+function UserLogin({setCurrentUserId,goToRegister}:UserFormLogin){
     return(
             <div className="user-form">
-                <Formik <UserForm>
-                    initialValues={initialUserValues}
-                    validationSchema={objectValidation}
+                <Formik <LoginForm>
+                    initialValues={initialLoginValues}
+                    validationSchema={loginValidation}
                     validateOnChange={false}
                     validateOnBlur={false}
-                    onSubmit={(values,{resetForm})=>{
-                        const idValue = Date.now()
-                        const newValues = {
-                            id: idValue,
-                            ...values
+                    onSubmit={(values,{setFieldError})=>{
+                        const foundUser = loginUser(values.email)
+                        if (foundUser === undefined){
+                            setFieldError("email","No existe un usuario con ese correo")
+                            return
                         }
-                        setUser(newValues)
-                        setWeekRoutine({...WeekRoutine,weekRoutineName:values.routine})
-                        resetForm()
-                    }
-                    }
-                
+                        setCurrentUserId(foundUser.id)
+                    }}
                 >
                     <Form id="user-login-form">
-                        <div className="div-inside-form">
-                            <label htmlFor="name">Nombre: </label>
-                            <Field id="name" className="input-user-form" name='name' placehold='Por favor ingresa tu nombre' ></Field>
-                            <ErrorMessage name="name" component='p'></ErrorMessage>
-    
-                        </div>
-                        
-                        <div className="div-inside-form">
-                            <label htmlFor="age">Edad: </label>
-                            <Field id="age" type="number" className="input-user-form" name='age' placehold='Por favor ingresa tu edad' ></Field>
-                            <ErrorMessage name="age" component='p'></ErrorMessage>
-    
-                        </div>
-
+                        <h2>🏋️ FitTracker</h2>
                         <div className="div-inside-form">
                             <label htmlFor="email">Correo Electronico: </label>
-                            <Field id="email" className="input-user-form" name='email' placehold='Por favor ingresa su correo electronico' ></Field>
+                            <Field id="email" className="input-user-form" name='email' ></Field>
                             <ErrorMessage name="email" component='p'></ErrorMessage>
-    
                         </div>
-                        
-                        <div className="div-inside-form">
-                            <label htmlFor="level">Experiencia: </label>
-                            <Field as='select' id="level" className="input-user-form" name='level' >
-                                <option value="beginner">Principiante</option>
-                                <option value="intermediate">Intermedio</option>
-                                <option value="expert">Avanzado</option>
-                            </Field>
-                            <ErrorMessage name="level" component='p'></ErrorMessage>
-                        </div>
-                        
-                        <div className="div-inside-form">
-                            <label htmlFor="routine">Rutina: </label>
-                            <Field id="routine" className="input-user-form" name='routine' placehold='Por favor ingresa tu rutina' ></Field>
-                            <ErrorMessage name="routine" component='p'></ErrorMessage>
-    
-                        </div>
-    
-                        <button id="submit-button" type="submit"> Ingresar a App</button>
+
+                        <button id="submit-button" type="submit">Iniciar sesión</button>
+                        <button type="button" className="link-button" onClick={goToRegister}>¿No tienes cuenta? Registrarme</button>
+                        <p className="login-hint">Usuarios de ejemplo: carlos@fittracker.com, ana@fittracker.com</p>
                     </Form>
-    
                 </Formik>
             </div>
         )

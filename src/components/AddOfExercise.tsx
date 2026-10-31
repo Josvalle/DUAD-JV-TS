@@ -4,8 +4,8 @@ import type {FormikProps} from 'formik'
 import CardioFields from "./CardioForm";
 import StrenghtFields from "./StrenghtFields";
 import FlexFields from "./FlexFields";
-import { createExercise } from "../funcs/exercisesFunc";
-import type { ExerciseForm2,ExerciseCategory, ExerciseInform,ExerciseStatus  } from "../types/Exercises";
+import { saveExercise } from "../funcs/systemFunc";
+import type { ExerciseForm2,ExerciseCategory, ExerciseStatus  } from "../types/Exercises";
 import type { Dispatch, SetStateAction } from 'react';
 import type { ExercisePreset } from '../types/External';
 
@@ -79,13 +79,14 @@ const objectEValidation = Yup.object(
 )
 
 interface AddExercises{
-    setExercises:Dispatch<SetStateAction<ExerciseInform[]>>
+    userId: number
+    setExerciseIds:Dispatch<SetStateAction<number[]>>
     preset: ExercisePreset | null
     setPreset: Dispatch<SetStateAction<ExercisePreset | null>>
 }
 
 
-function AddOfExercises({setExercises,preset,setPreset}:AddExercises){
+function AddOfExercises({userId,setExerciseIds,preset,setPreset}:AddExercises){
     const startValues: ExerciseForm2 = preset === null ? initialValues : {...initialValues, nameExercise: preset.nameExercise, category: preset.category}
 
     return(
@@ -98,12 +99,12 @@ function AddOfExercises({setExercises,preset,setPreset}:AddExercises){
                         onSubmit={(values, {resetForm})=>{
                                 
                                 
-                                const exerciseValues = createExercise(values, preset === null ? 'local' : 'api')
-                                if (exerciseValues === null){
+                                const exerciseId = saveExercise(values, preset === null ? 'local' : 'api', userId)
+                                if (exerciseId === null){
                                     return
                                 }
 
-                                setExercises((previous)=> [...previous,exerciseValues])
+                                setExerciseIds((previous)=> [...previous,exerciseId])
 
                                 resetForm();
                                 setPreset(null)
