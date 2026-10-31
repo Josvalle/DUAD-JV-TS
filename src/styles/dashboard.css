@@ -253,3 +253,75 @@ body {
     align-items: center;
     width: 100%;
 }
+
+
+#main-navigation{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: #6a59b6;
+    width: 100%;
+    padding: 0.5em 0;
+}
+
+.nav-button{
+    background-color: transparent;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    padding: 0.75em 1.25em;
+    margin: 0 0.25em;
+    cursor: pointer;
+}
+
+.nav-button-active{
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+#system-dashboard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70%;
+}
+
+.system-card{
+    background-color: white;
+    border-radius: 8px;
+    width: 100%;
+    padding: 1em;
+    margin-top: 1em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.link-button{
+    background: none;
+    border: none;
+    color: #6a59b6;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 1em;
+}
+
+.login-hint{
+    font-size: 0.8em;
+    color: gray;
+    text-align: center;
+}
+
+.exercise-row{
+    display: flex;
+    align-items: center;
+}
+
+.small-button{
+    background-color: #6a59b6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    padding: 0.4em 0.8em;
+    margin-left: 0.5em;
+    cursor: pointer;
+}

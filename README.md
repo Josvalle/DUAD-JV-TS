@@ -26,6 +26,12 @@ Validate external exercises before adding them. Exercises with missing required 
 
 Show a unified report grouped by category with local and API exercises.
 
+Store users, exercises, routines and activity in a single generic storage layer (Store<T>) that works with any entity that has a numeric id.
+
+Show a closing dashboard with the global state of the system: users, catalog by source and category, active routines, weekly load per user with a rest recommendation, and recent activity.
+
+Log in with an email, or register a new user from the login screen. Two demo users are loaded when the app starts: carlos@fittracker.com and ana@fittracker.com.
+
 # Installation and Setup
 
 Make sure Node.js is installed on your computer.
@@ -63,6 +69,14 @@ You can get a free key at https://api-ninjas.com. The .env file is ignored by gi
 Restart the development server after changing the .env file.
 
 Vite includes every variable that starts with VITE_ in the JavaScript sent to the browser, so anyone can read the key from the browser. This is acceptable for this exercise, but in a real project the request should go through a backend that keeps the key private and forwards the call to the API.
+
+## Storage Layer
+
+The storage layer lives in src/storage/Store.ts. It is one generic class, Store<T extends { id: number }>, with these operations:
+
+add(item), getAll() (returns a copy), findById(id) (undefined when not found), remove(id) (returns true or false), update(id, changes) (only the fields that change, undefined when not found) and find(predicate).
+
+The data lives in memory only, so it is reset when the page is reloaded.
 
 ## TypeScript Validation
 

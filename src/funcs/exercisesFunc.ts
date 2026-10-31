@@ -1,4 +1,4 @@
-import type {ExerciseForm2,ExerciseSource,SourceCount,RoutineEntry,MaxCaloriesAccumulator,CategorySeparation,ExerciseInform,ExerciseCategory,SummaryCategory,WeekDays} from '../types/Exercises'
+import type {ExerciseForm2,ExerciseSource,SourceCount,StoredRoutine,StoredSession,WeekRoutine,RoutineEntry,MaxCaloriesAccumulator,CategorySeparation,ExerciseInform,ExerciseCategory,SummaryCategory,WeekDays} from '../types/Exercises'
 type CaloriesByDay = Partial<Record<WeekDays, number>>;
 
 export const weekDays: WeekDays[] = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"]
@@ -149,7 +149,7 @@ export function categorySummary (categoryList: CategorySeparation, category:Exer
 
 
 
-export function createExercise(values: ExerciseForm2, source: ExerciseSource): ExerciseInform | null {
+export function createExercise(values: ExerciseForm2, source: ExerciseSource, id: number, userId: number): ExerciseInform | null {
     const minutes = Number(values.minutes)
     const caloriesPerMinute = Number(values.caloriesPerMinute)
     const totalCalories = caloriesPerMinute * minutes
@@ -161,7 +161,8 @@ export function createExercise(values: ExerciseForm2, source: ExerciseSource): E
             caloriesPerMinute,
             totalCalories,
             status: values.status,
-            id: crypto.randomUUID(),
+            id,
+            userId,
             source,
             category: 'Cardio',
             distance: Number(values.distance),
@@ -175,7 +176,8 @@ export function createExercise(values: ExerciseForm2, source: ExerciseSource): E
             caloriesPerMinute,
             totalCalories,
             status: values.status,
-            id: crypto.randomUUID(),
+            id,
+            userId,
             source,
             category: 'Fuerza',
             sets: Number(values.sets),
@@ -189,7 +191,8 @@ export function createExercise(values: ExerciseForm2, source: ExerciseSource): E
             caloriesPerMinute,
             totalCalories,
             status: values.status,
-            id: crypto.randomUUID(),
+            id,
+            userId,
             source,
             category: 'Flexibilidad',
             pose: values.pose,
@@ -199,11 +202,46 @@ export function createExercise(values: ExerciseForm2, source: ExerciseSource): E
     return null
 }
 
-export function createSession(day: WeekDays, exercises: ExerciseInform[], comment: string): RoutineEntry {
+export function createSession(day: WeekDays, exerciseIds: number[], comment: string): StoredSession {
     return {
         day,
-        exerciseInfo: exercises,
+        exerciseIds,
         comment
+    }
+}
+
+export function resolveRoutine(routine: StoredRoutine | undefined, exercises: ExerciseInform[]): WeekRoutine {
+    if (routine === undefined){
+        return {weekRoutineName: "", sessions: []}
+    }
+    return {
+        weekRoutineName: routine.name,
+        sessions: routine.sessions.map((session: StoredSession): RoutineEntry => ({
+            day: session.day,
+            exerciseInfo: session.exerciseIds.flatMap((id: number) => exercises.filter((exercise: ExerciseInform) => exercise.id === id)),
+            comment: session.comment
+        }))
+    }
+}
+
+export function loadRecommendation(totalMinutes: number, trainedDays: number): string {
+    if (totalMinutes > 300){
+        return "Dia de descanso Obligatorio"
+    }else if (trainedDays > 5){
+        return "Dia de descanso Necesario"
+    }else if (totalMinutes < 150){
+        return "⚠️ Considerá agregar un día más de entrenamiento esta semana."
+    }else if (trainedDays < 3){
+        return "⚠️ Considerá agregar un día más de entrenamiento esta semana."
+    }
+    return "✅ Buena semana, dentro del rango recomendado"
+}
+
+export function countByCategory(exercises: ExerciseInform[]): Record<ExerciseCategory, number> {
+    return {
+        Cardio: exercises.filter((exercise: ExerciseInform) => exercise.category === "Cardio").length,
+        Fuerza: exercises.filter((exercise: ExerciseInform) => exercise.category === "Fuerza").length,
+        Flexibilidad: exercises.filter((exercise: ExerciseInform) => exercise.category === "Flexibilidad").length
     }
 }
 
@@ -220,11 +258,10 @@ export function formatExerciseDetail(exercise: ExerciseInform): string {
     }
 }
 
-export function countBySource(sessions: RoutineEntry[]): SourceCount {
-    const allExercises: ExerciseInform[] = sessions.flatMap(session => session.exerciseInfo)
-    const api = allExercises.filter(exercise => exercise.source === "api").length
+export function countBySource(exercises: ExerciseInform[]): SourceCount {
+    const api = exercises.filter(exercise => exercise.source === "api").length
     return {
-        local: allExercises.length - api,
+        local: exercises.length - api,
         api
     }
 }

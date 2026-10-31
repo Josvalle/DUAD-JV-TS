@@ -1,5 +1,5 @@
 
-import { obtainMaxCalories,categorySummary, exercisePerCategory, formatExerciseDetail, countBySource } from "../funcs/exercisesFunc"
+import { obtainMaxCalories,categorySummary, exercisePerCategory, formatExerciseDetail, countBySource, loadRecommendation } from "../funcs/exercisesFunc"
 
 import type { InvalidExercise } from "../types/External"
 import type { RoutineEntry, ExerciseCategory, ExerciseInform } from "../types/Exercises"
@@ -24,22 +24,14 @@ function ExerciseDashboard({sessions,invalidExercises}: ExerciseInformation){
     const cardioCategory = categorySummary(categoryExercises,'Cardio')
     const strengthCategory = categorySummary(categoryExercises,'Fuerza')
     const flexCategory = categorySummary(categoryExercises,'Flexibilidad')
-    const sourceCount = countBySource(sessions)
+    const sourceCount = countBySource(sessions.flatMap((session: RoutineEntry) => session.exerciseInfo))
 
     return(
         <div>
             <p>Tiempo total: {weekValues.totalMinutes} | Total Calorias:  {weekValues.totalCalories}</p>
             <p>Dia entrenado: {weekValues.amountOfDay} | Promedio de Calorias por dia: {weekValues.averageCalories} </p>
             <p>🏃 Cardio: {cardioCategory.summaryTime} Min | 💪 Fuerza: {strengthCategory.summaryTime} Min | 🧘 Flexibilidad: {flexCategory.summaryTime} Min </p>
-            { weekValues.totalMinutes > 300 ? (
-                <p> Dia de descanso Obligatorio</p>
-            ) : weekValues.amountOfDay > 5 ? (
-                <p> Dia de descanso Necesario</p>
-            ) : weekValues.totalMinutes < 150 ? (
-                <p> ⚠️ Considerá agregar un día más de entrenamiento esta semana.</p>
-            ) : weekValues.amountOfDay < 3 ? (
-                <p>⚠️ Considerá agregar un día más de entrenamiento esta semana.</p>
-            ) : ( <p>Buena semana crack </p>) }
+            <p>{loadRecommendation(weekValues.totalMinutes, weekValues.amountOfDay)}</p>
 
             <h3>📊 Reporte por Tipo de Ejercicio</h3>
             {categories.map((category: ExerciseCategory) => {

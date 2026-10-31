@@ -1,8 +1,9 @@
-import type { WeekDays, WeekRoutine, ExerciseInform, ExerciseSource  } from "../types/Exercises";
+import type { WeekDays, ExerciseSource  } from "../types/Exercises";
 import { useState, type Dispatch,type SetStateAction } from "react";
 import AddOfExercises from "./AddOfExercise";
 import ApiExercises from "./ApiExercises";
-import { createSession, obtainDay } from "../funcs/exercisesFunc";
+import { obtainDay } from "../funcs/exercisesFunc";
+import { saveSession, discardExercises } from "../funcs/systemFunc";
 import type { ExercisePreset, InvalidExercise } from "../types/External";
 import type { UserLevel } from "../types/Users";
 import '../styles/dashboard.css'
@@ -10,7 +11,7 @@ import '../styles/dashboard.css'
 
 
 interface ExerciseFormAdd{
-    setWeekRoutine: Dispatch<SetStateAction<WeekRoutine>>;
+    userId: number;
     level: UserLevel;
     invalidExercises: InvalidExercise[];
     setInvalidExercises: Dispatch<SetStateAction<InvalidExercise[]>>;
@@ -21,21 +22,27 @@ interface ExerciseFormAdd{
 
 
 
-function ExerciseFormInput({setWeekRoutine,level,invalidExercises,setInvalidExercises}:ExerciseFormAdd){
+function ExerciseFormInput({userId,level,invalidExercises,setInvalidExercises}:ExerciseFormAdd){
     const [day,setDay] = useState<WeekDays>("");
-    const [exercises,setExercises] = useState<ExerciseInform[]>([])
+    const [exerciseIds,setExerciseIds] = useState<number[]>([])
     const [comment,setComment] = useState<string>("")
     const [source,setSource] = useState<ExerciseSource>("local")
     const [preset,setPreset] = useState<ExercisePreset | null>(null)
 
     function addSession(){
         
-        const session = createSession(day, exercises, comment)
-        
-        setWeekRoutine(previousRoutine => ({...previousRoutine,sessions: [...previousRoutine.sessions,session]}));
-        
-        setDay(""),
-        setExercises([]),
+        saveSession(userId, day, exerciseIds, comment)
+        resetSession()
+    }
+
+    function cancelSession(){
+        discardExercises(exerciseIds)
+        resetSession()
+    }
+
+    function resetSession(){
+        setDay("")
+        setExerciseIds([])
         setComment("")
         setPreset(null)
         setSource("local")
@@ -74,7 +81,8 @@ function ExerciseFormInput({setWeekRoutine,level,invalidExercises,setInvalidExer
 
                 {(source === "local" || preset !== null) && (
                     <AddOfExercises
-                    setExercises={setExercises}
+                    userId={userId}
+                    setExerciseIds={setExerciseIds}
                     setPreset={setPreset}
                     preset={preset} />
                 )}
@@ -82,7 +90,7 @@ function ExerciseFormInput({setWeekRoutine,level,invalidExercises,setInvalidExer
                 <textarea className="comment-area" value={comment} onChange={(e)=> setComment(e.target.value)}/>
                 <div className="buttons-exercises-input">
                     <button className="submit-exercises" onClick={addSession}>Terminar Session</button>
-                    <button className="submit-exercises" onClick={()=>setDay("")}>Cancelar</button>
+                    <button className="submit-exercises" onClick={cancelSession}>Cancelar</button>
                 </div>
                 
                 </>

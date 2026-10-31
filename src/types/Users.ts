@@ -1,5 +1,3 @@
-import type { WeekRoutine} from './Exercises'
-
 export type UserLevel = "beginner" | "intermediate" | "expert"
 
 
@@ -24,17 +22,3 @@ export interface UserPlan{
     StartDate: string;
     UserStatus: Status
 }
-
-export interface ClientsInfo{
-    clientName: string;
-    clientLevel: UserLevel;
-    routineName:string;
-    weekRoutine:WeekRoutine;
-
-}
-
-export interface Instructor{
-    name:string;
-    clients:ClientsInfo[]
-}
-
